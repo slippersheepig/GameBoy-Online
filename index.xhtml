@@ -21,15 +21,15 @@
         <script type="text/javascript" src="js/other/resize.js"/>
         <script type="text/javascript" src="js/GameBoyCore.js"/>
         <script type="text/javascript" src="js/GameBoyIO.js"/>
-        <title>GameBoy Online</title>
+        <title>GameBoyColor</title>
     </head>
     <body>
         <div id="GameBoy" class="window">
             <div class="menubar">
-                <span id="GameBoy_file_menu">File</span>
-                <span id="GameBoy_settings_menu">Settings</span>
-                <span id="GameBoy_view_menu">View</span>
-                <span id="GameBoy_about_menu">About</span>
+                <span id="GameBoy_file_menu">文件</span>
+                <span id="GameBoy_settings_menu">设置</span>
+                <span id="GameBoy_view_menu">视图</span>
+                <span id="GameBoy_about_menu">关于</span>
             </div>
             <div id="gfx">
                 <canvas id="mainCanvas"/>
@@ -40,101 +40,101 @@
         <div id="terminal" class="window">
             <div id="terminal_output"/>
             <div class="button_rack">
-                <button id="terminal_clear_button" class="left">Clear Messages</button>
-                <button id="terminal_close_button" class="right">Close Terminal</button>
+                <button id="terminal_clear_button" class="left">清除消息</button>
+                <button id="terminal_close_button" class="right">关闭终端</button>
             </div>
         </div>
         <div id="about" class="window">
             <div id="about_message">
                 <h1>GameBoy Online</h1>
-                <p>This is a GameBoy Color emulator written purely in JavaScript by Grant Galitz.</p><p>The graphics blitting is done through HTML5 canvas, with the putImageData and drawImage functions.</p><p>Save states are implemented through the window.localStorage object, and are serialized/deserialized through JSON. SRAM saving is also implemented through the window.localStorage object, and are serialized/deserialized through JSON. In order for save states to work properly on most browsers, you need set the maximum size limit for DOM storage higher, to meet the needs of the emulator's save data size.</p><p>For more information about this emulator and its source code, visit the GIT repository at: <a href="https://github.com/taisel/GameBoy-Online" target="_blank">https://github.com/taisel/GameBoy-Online</a>.
+                <p>这是由Grant Galitz使用纯JavaScript编写的GameBoy Color模拟器。</p><p>图形通过HTML5 Canvas的putImageData和drawImage函数进行渲染。</p><p>存档通过window.localStorage实现；若需更大的存储空间，请调整浏览器的本地存储配额以满足模拟器存档数据的需求。</p><p>有关此模拟器及其源码的更多信息，请访问Git仓库：<a href="https://github.com/taisel/GameBoy-Online" target="_blank">https://github.com/taisel/GameBoy-Online</a>。
                 </p>
             </div>
             <div class="button_rack">
-                <button id="about_close_button" class="center">Close Popup</button>
+                <button id="about_close_button" class="center">关闭弹窗</button>
             </div>
         </div>
         <div class="window" id="settings">
             <div id="toggle_settings">
                 <div class="setting">
-                    <span>Enable Sound:</span>
+                    <span>启用声音：</span>
                     <input type="checkbox" checked="checked" id="enable_sound"/>
                 </div>
                 <div class="setting">
-                    <span>GB mode has priority over GBC mode:</span>
+                    <span>GB模式优先于GBC模式：</span>
                     <input type="checkbox" id="disable_colors"/>
                 </div>
                 <div class="setting">
-                    <span>Use the BIOS ROM:</span>
+                    <span>使用BIOS ROM：</span>
                     <input type="checkbox" checked="checked" id="enable_gbc_bios"/>
                 </div>
                 <div class="setting">
-                    <span>Override ROM only cartridge typing to MBC1:</span>
+                    <span>将仅含ROM的卡带类型覆盖为MBC1：</span>
                     <input type="checkbox" checked="checked" id="rom_only_override"/>
                 </div>
                 <div class="setting">
-                    <span>Always allow reading and writing to the MBC banks:</span>
+                    <span>始终允许对MBC记忆库进行读写：</span>
                     <input type="checkbox" checked="checked" id="mbc_enable_override"/>
                 </div>
                 <div class="setting">
-                    <span>Colorize Classic GameBoy Palettes:</span>
+                    <span>为经典GameBoy调色板着色：</span>
                     <input type="checkbox" checked="checked" id="enable_colorization"/>
                 </div>
                 <div class="setting">
-                    <span>Minimal view on fullscreen:</span>
+                    <span>全屏时使用最小化视图：</span>
                     <input type="checkbox" checked="checked" id="do_minimal"/>
                 </div>
                 <div class="setting">
-                    <span>Resize canvas directly in JavaScript:</span>
+                    <span>在JavaScript中直接调整画布大小：</span>
                     <input type="checkbox" id="software_resizing"/>
                 </div>
                 <div class="setting">
-                    <span>Disallow typed arrays to be used:</span>
+                    <span>禁止使用typed arrays：</span>
                     <input type="checkbox" id="typed_arrays_disallow"/>
                 </div>
                 <div class="setting">
-                    <span>Use the DMG boot ROM instead of CGB:</span>
+                    <span>使用DMG启动ROM而不是CGB：</span>
                     <input type="checkbox" id="gb_boot_rom_utilized"/>
                 </div>
                 <div class="setting">
-                    <span>Smooth upon resizing canvas:</span>
+                    <span>在调整画布大小时启用平滑：</span>
                     <input type="checkbox" checked="checked" id="resize_smoothing"/>
                 </div>
                 <div class="setting">
-                    <span>Enable Channel 1 Audio:</span>
+                    <span>启用声道1：</span>
                     <input type="checkbox" checked="checked" id="channel1"/>
                 </div>
                 <div class="setting">
-                    <span>Enable Channel 2 Audio:</span>
+                    <span>启用声道2：</span>
                     <input type="checkbox" checked="checked" id="channel2"/>
                 </div>
                 <div class="setting">
-                    <span>Enable Channel 3 Audio:</span>
+                    <span>启用声道3：</span>
                     <input type="checkbox" checked="checked" id="channel3"/>
                 </div>
                 <div class="setting">
-                    <span>Enable Channel 4 Audio:</span>
+                    <span>启用声道4：</span>
                     <input type="checkbox" checked="checked" id="channel4"/>
                 </div>
             </div>
             <div class="button_rack">
-                <button id="settings_close_button" class="center">Close Settings</button>
+                <button id="settings_close_button" class="center">关闭设置</button>
             </div>
         </div>
         <div id="instructions" class="window">
             <div id="keycodes">
-                <h1>Keyboard Controls:</h1>
+                <h1>键盘控制：</h1>
                 <ul>
-                    <li>X/J are A.</li>
-                    <li>Z/Y/Q are B.</li>
-                    <li>Shift is Select.</li>
-                    <li>Enter is Start.</li>
-                    <li>The d-pad is the control pad.</li>
-                    <li>The escape key (esc) allows you to get in and out of fullscreen mode.</li>
+                    <li>键盘X/J对应GBC的A按钮。</li>
+                    <li>键盘Z/Y/Q对应GBC的B按钮。</li>
+                    <li>键盘Shift对应GBC的Select按钮。</li>
+                    <li>键盘Enter（回车）对应GBC的Start按钮。</li>
+                    <li>使用键盘方向键控制方向。</li>
+                    <li>使用键盘左上角退出键 (Esc) 可以进入或退出全屏模式。</li>
                 </ul>
             </div>
             <div class="button_rack">
-                <button id="instructions_close_button" class="center">Close Instructions</button>
+                <button id="instructions_close_button" class="center">关闭说明</button>
             </div>
         </div>
         <div id="input_select" class="window">
@@ -142,7 +142,7 @@
                 <input type="file" id="local_file_open"/>
             </form>
             <div class="button_rack">
-                <button id="input_select_close_button" class="center">Close File Input</button>
+                <button id="input_select_close_button" class="center">关闭文件输入</button>
             </div>
         </div>
         <div id="save_importer" class="window">
@@ -150,7 +150,7 @@
                 <input type="file" id="save_open"/>
             </form>
             <div class="button_rack">
-                <button id="save_importer_close_button" class="center">Close Save Importer</button>
+                <button id="save_importer_close_button" class="center">关闭存档导入</button>
             </div>
         </div>
         <div class="window" id="local_storage_listing">
@@ -158,11 +158,11 @@
                 <div id="storageListingMasterContainerSub"/>
             </div>
             <div id="download_all_storage">
-                <a href="about:blank" id="download_local_storage_dba">Export all saved data.</a>
+                <a href="about:blank" id="download_local_storage_dba">导出所有存档。</a>
             </div>
             <div class="button_rack">
-                <button id="local_storage_list_refresh_button" class="left">Refresh List</button>
-                <button id="local_storage_list_close_button" class="right">Close Storage List</button>
+                <button id="local_storage_list_refresh_button" class="left">刷新列表</button>
+                <button id="local_storage_list_close_button" class="right">关闭存储列表</button>
             </div>
         </div>
         <div class="window" id="local_storage_popup">
@@ -170,7 +170,7 @@
                 <div id="storagePopupMasterContainer"/>
             </div>
             <div class="button_rack">
-                <button id="local_storage_popup_close_button" class="center">Close Storage Popup</button>
+                <button id="local_storage_popup_close_button" class="center">关闭存储弹窗</button>
             </div>
         </div>
         <div class="window" id="freeze_listing">
@@ -178,30 +178,30 @@
                 <div id="freezeListingMasterContainerSub"/>
             </div>
             <div class="button_rack">
-                <button id="freeze_list_refresh_button" class="left">Refresh List</button>
-                <button id="freeze_list_close_button" class="right">Close Freeze State List</button>
+                <button id="freeze_list_refresh_button" class="left">刷新列表</button>
+                <button id="freeze_list_close_button" class="right">关闭冻结状态列表</button>
             </div>
         </div>
         <ul class="menu" id="GameBoy_file_popup">
             <li>Open As<ul class="menu">
-                <li id="data_uri_clicker">Base 64 Encoding</li>
-                <li id="internal_file_clicker">Local File</li>
+                <li id="data_uri_clicker">Base64加密</li>
+                <li id="internal_file_clicker">本地文件</li>
             </ul></li>
-            <li id="save_SRAM_state_clicker">Save Game Memory</li>
-            <li id="save_state_clicker">Save Freeze State</li>
-            <li id="set_volume">Set Volume</li>
-            <li id="set_speed">Set Speed</li>
-            <li id="restart_cpu_clicker">Restart</li>
-            <li id="run_cpu_clicker">Resume</li>
-            <li id="kill_cpu_clicker">Pause</li>
+            <li id="save_SRAM_state_clicker">保存到记忆体</li>
+            <li id="save_state_clicker">保存冻结状态</li>
+            <li id="set_volume">设置音量</li>
+            <li id="set_speed">设置速度</li>
+            <li id="restart_cpu_clicker">重启</li>
+            <li id="run_cpu_clicker">恢复</li>
+            <li id="kill_cpu_clicker">暂停</li>
         </ul>
         <ul class="menu" id="GameBoy_view_popup">
-            <li id="view_terminal">Terminal</li>
-            <li id="view_instructions">Instructions</li>
-            <li id="view_importer">Save Importer</li>
-            <li id="local_storage_list_menu">Save Manager</li>
-            <li id="freeze_list_menu">Freeze State Manager</li>
-            <li id="view_fullscreen">Fullscreen Mode</li>
+            <li id="view_terminal">终端</li>
+            <li id="view_instructions">说明</li>
+            <li id="view_importer">存档导入</li>
+            <li id="local_storage_list_menu">记忆体管理</li>
+            <li id="freeze_list_menu">冻结状态管理</li>
+            <li id="view_fullscreen">全屏模式</li>
         </ul>
         <div id="fullscreenContainer">
             <canvas id="fullscreen" class="maximum"/>
