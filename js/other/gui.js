@@ -83,7 +83,7 @@ function registerGUIEvents() {
 	addEvent("deviceorientation", window, GameBoyGyroSignalHandler);
 	new popupMenu(document.getElementById("GameBoy_file_menu"), document.getElementById("GameBoy_file_popup"));
 	addEvent("click", document.getElementById("data_uri_clicker"), function () {
-		var datauri = prompt("Please input the ROM image's Base 64 Encoded Text:", "");
+		var datauri = prompt("请输入ROM的Base64编码：", "");
 		if (datauri != null && datauri.length > 0) {
 			try {
 				cout(Math.floor(datauri.length * 3 / 4) + " bytes of data submitted by form (text length of " + datauri.length + ").", 0);
@@ -97,7 +97,7 @@ function registerGUIEvents() {
 	});
 	addEvent("click", document.getElementById("set_volume"), function () {
 		if (GameBoyEmulatorInitialized()) {
-			var volume = prompt("Set the volume here:", "1.0");
+			var volume = prompt("在下方设置游戏音量：", "1.0");
 			if (volume != null && volume.length > 0) {
 				settings[3] = Math.min(Math.max(parseFloat(volume), 0), 1);
 				gameboy.changeVolume();
@@ -106,7 +106,7 @@ function registerGUIEvents() {
 	});
 	addEvent("click", document.getElementById("set_speed"), function () {
 		if (GameBoyEmulatorInitialized()) {
-			var speed = prompt("Set the emulator speed here:", "1.0");
+			var speed = prompt("在下方设置游戏速度：", "1.0");
 			if (speed != null && speed.length > 0) {
 				gameboy.setSpeed(Math.max(parseFloat(speed), 0.001));
 			}
