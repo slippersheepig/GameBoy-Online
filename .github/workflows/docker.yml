@@ -2,6 +2,8 @@ name: Build & Push Docker (Hub + GHCR)
 
 on:
   workflow_dispatch:
+  repository_dispatch:
+    types: [nginx_update]
 
 env:
   IMAGE_NAME: gameboy
