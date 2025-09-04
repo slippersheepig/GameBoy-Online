@@ -4,11 +4,11 @@
     <head>
         <style type="text/css">@import url(&quot;css/GameBoy.css&quot;);</style>
         <script type="text/javascript">
-        var DEBUG_MESSAGES = false;
-        var DEBUG_WINDOWING = false;
-        window.onload = function () {
-            windowingInitialize();
-        }
+    var DEBUG_MESSAGES = false;
+    var DEBUG_WINDOWING = false;
+    window.onload = function () {
+        windowingInitialize();
+    }
         </script>
         <script type="text/javascript" src="js/other/windowStack.js"/>
         <script type="text/javascript" src="js/other/terminal.js"/>
@@ -22,9 +22,6 @@
         <script type="text/javascript" src="js/GameBoyCore.js"/>
         <script type="text/javascript" src="js/GameBoyIO.js"/>
         <title>GameBoyColor</title>
-    
-    <link rel="stylesheet" href="css/mobile.css"/>
-    <script type="text/javascript" src="js/other/mobile-bridge.js"></script>
     </head>
     <body>
         <div id="GameBoy" class="window">
@@ -35,7 +32,7 @@
                 <span id="GameBoy_about_menu">关于</span>
             </div>
             <div id="gfx">
-                <canvas id="mainCanvas"></canvas>
+                <canvas id="mainCanvas"/>
                 <span id="title">GameBoy</span>
                 <span id="port_title">Online</span>
             </div>
@@ -207,7 +204,7 @@
             <li id="view_fullscreen">全屏模式</li>
         </ul>
         <div id="fullscreenContainer">
-            <canvas id="fullscreen" class="maximum"></canvas>
+            <canvas id="fullscreen" class="maximum"/>
         </div>
     </body>
 </html>
