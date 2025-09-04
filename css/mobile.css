@@ -286,7 +286,7 @@ html, body {
 
   /* Controls overlay (D-pad left, A/B right, Start/Select centered) */
   .mobile-controls-overlay {
-    position: fixed;
+    position: absolute;
     left: 0;
     right: 0;
     bottom: 8px;
