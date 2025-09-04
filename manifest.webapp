@@ -2,7 +2,7 @@
   "name": "GameBoy Online",
   "short_name": "GBO",
   "description": "GameBoy / GameBoy Color emulator in the browser.",
-  "start_url": "index.xhtml",
+  "start_url": "index.html",
   "display": "standalone",
   "background_color": "#000000",
   "theme_color": "#1f2937",
