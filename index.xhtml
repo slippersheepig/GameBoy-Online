@@ -2,6 +2,23 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-US">
     <head>
+    <!-- 新增：PWA 清单 + 视口 + 移动端自动跳转 -->
+    <link rel="manifest" href="manifest.webapp">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <script>
+    (function () {
+      try {
+        var ua = navigator.userAgent || '';
+        var isMobileUA = /Android|iPhone|iPad|iPod|Mobile/i.test(ua);
+        var isSmallScreen = Math.max(screen.width, screen.height) <= 812;
+        if ((isMobileUA || isSmallScreen) && !/mobile\.html$/i.test(location.pathname)) {
+          var target = 'mobile.html' + location.search + location.hash;
+          // 避免污染历史记录
+          location.replace(target);
+        }
+      } catch (e) {}
+    })();
+    </script>
         <style type="text/css">@import url(&quot;css/GameBoy.css&quot;);</style>
         <script type="text/javascript">
     var DEBUG_MESSAGES = false;
@@ -24,6 +41,17 @@
         <title>GameBoyColor</title>
     </head>
     <body>
+        <!-- 新增：切换到移动版入口（桌面可见） -->
+        <style>
+          .switch-link{
+            position:fixed;top:10px;right:10px;z-index:1000;
+            padding:6px 10px;border-radius:8px;background:#222;color:#fff;
+            text-decoration:none;opacity:.85
+          }
+          .switch-link:hover{opacity:1}
+          @media (max-width: 900px){ .switch-link{ display:none; } }
+        </style>
+        <a class="switch-link" href="mobile.html" title="切换到移动版">切换到移动版</a>
         <div id="GameBoy" class="window">
             <div class="menubar">
                 <span id="GameBoy_file_menu">文件</span>
