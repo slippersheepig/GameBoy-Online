@@ -240,12 +240,12 @@ html, body {
 
   /* Full-viewport mobile shell */
   #mobile_shell_wrapper {
-      display: block !important;
-      position: relative;
-      width: 100%;
-      min-height: 100vh;
-      box-sizing: border-box;
-      padding: 0;
+    display: block !important;
+    position: relative;
+    width: 100%;
+    min-height: 100vh;
+    box-sizing: border-box;
+    padding: 0;
   }
 
   /* Make shell fill the viewport and use flex layout */
