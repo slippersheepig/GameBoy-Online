@@ -22,6 +22,24 @@
         <script type="text/javascript" src="js/GameBoyCore.js"/>
         <script type="text/javascript" src="js/GameBoyIO.js"/>
         <title>GameBoyColor</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no"/>
+        <link rel="stylesheet" href="css/mobile.css" media="(max-width: 900px)"/>
+        <style type="text/css">
+        /* Mobile merge: hide desktop window & adjust gfx on small screens */
+        .mobile-only { display: none; }
+        @media (max-width: 900px) {
+            .mobile-only { display: block; }
+            #GameBoy { display: none; }
+            /* Use mobile background */
+            html, body { background-color: black; }
+            /* Shrink gfx to screen area */
+            #gfx { width: 160px; margin: 20px auto 0 auto; }
+            #gfx #title, #gfx #port_title { display: none; }
+            /* Prevent overscroll on mobile controls */
+            #gameboy_shell { touch-action: manipulation; }
+        }
+        </style>
+        <script type="text/javascript" src="js/other/mobile-bridge.js"/>
     </head>
     <body>
         <div id="GameBoy" class="window">
@@ -206,5 +224,60 @@
         <div id="fullscreenContainer">
             <canvas id="fullscreen" class="maximum"/>
         </div>
+    <!-- Mobile shell start (merged from mobile.html) -->
+    <div id="mobile_shell_wrapper" class="mobile-only" style="display:none;">
+    <div id="gameboy_shell">
+          <span id="on_off">OFF ! ! ON</span>
+          <div id="screen_cover">
+            <div id="power">
+              <div class="two_column">
+                <div id="power_light"></div>
+                <div>)))</div>
+              </div>
+              POWER
+            </div>
+            <div id="canvas_container"><div id="mobile_canvas_mount"></div></div>
+            <div>
+              GameBoy <span id="pocket">Pocket</span>
+            </div>
+          </div>
+          <div id="shadow"></div>
+          <div id="d_pad">
+            <div id="d_pad_up">
+              <div id="arrow_up" data-key-zone="up"></div>
+            </div>
+            <div id="d_pad_left_right">
+              <div id="d_pad_left">
+                <div id="arrow_left" data-key-zone="left"></div>
+              </div>
+              <div id="d_pad_right">
+                <div id="arrow_right" data-key-zone="right"></div>
+              </div>
+              <div id="d_pad_center"></div>
+            </div>
+            <div id="d_pad_down">
+              <div id="arrow_down" data-key-zone="down"></div>
+            </div>
+          </div>
+          <div id="a_button_group" class="button_group" data-key-zone="a">
+            <div class="round_button"></div>
+            A
+          </div>
+          <div id="b_button_group" class="button_group" data-key-zone="b">
+            <div class="round_button"></div>
+            B
+          </div>
+          <div id="select_button_group" class="button_group" data-key-zone="select">
+            <div class="flat_button"></div>
+            SELECT
+          </div>
+          <div id="start_button_group" class="button_group" data-key-zone="start">
+            <div class="flat_button"></div>
+            START
+          </div>
+          <img id="speaker" src="images/speaker.png"/>
+        </div>
+    </div>
+    <!-- Mobile shell end -->
     </body>
 </html>
