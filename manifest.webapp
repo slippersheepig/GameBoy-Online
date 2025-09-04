@@ -1,10 +1,13 @@
 {
-  "name": "GAMEBOY",
-  "description": "GameBoy Online GAMEBOY Emulator",
-  "launch_path": "/mobile.html",
-  "fullscreen": true,
-  "icons": {
-    "128": "/images/128.png"
-  },
-  "orientation": ["portrait-primary"]
+  "name": "GameBoy Online",
+  "short_name": "GBO",
+  "description": "GameBoy / GameBoy Color emulator in the browser.",
+  "start_url": "index.xhtml",
+  "display": "standalone",
+  "background_color": "#000000",
+  "theme_color": "#1f2937",
+  "icons": [
+    { "src": "images/128.png", "sizes": "128x128", "type": "image/png" }
+  ],
+  "orientation": ["portrait-primary", "landscape-primary"]
 }
