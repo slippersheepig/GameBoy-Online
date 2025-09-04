@@ -210,4 +210,63 @@
             <canvas id="fullscreen" class="maximum"></canvas>
         </div>
     </body>
+<!-- 移动端虚拟按键 -->
+<div id="controls" style="display:none;">
+  <div id="dpad">
+    <button id="up" class="dpad-btn">▲</button>
+    <div>
+      <button id="left" class="dpad-btn">◀</button>
+      <button id="right" class="dpad-btn">▶</button>
+    </div>
+    <button id="down" class="dpad-btn">▼</button>
+  </div>
+  <div id="ab">
+    <button id="a" class="ab-btn">A</button>
+    <button id="b" class="ab-btn">B</button>
+  </div>
+  <div id="start-select">
+    <button id="start" class="start-btn">Start</button>
+    <button id="select" class="select-btn">Select</button>
+  </div>
+</div>
+
+<script>
+(function(){
+  // 简单判断是否移动端
+  const isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
+  if (isMobile) {
+    document.getElementById("controls").style.display = "block";
+  }
+
+  // 按钮与键盘映射
+  const mapping = {
+    "up": 38,      // ↑
+    "down": 40,    // ↓
+    "left": 37,    // ←
+    "right": 39,   // →
+    "a": 90,       // Z 键
+    "b": 88,       // X 键
+    "start": 13,   // Enter
+    "select": 16   // Shift
+  };
+
+  function triggerKey(code, type) {
+    const event = new KeyboardEvent(type, { keyCode: code, which: code });
+    document.dispatchEvent(event);
+  }
+
+  Object.keys(mapping).forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.addEventListener("touchstart", e => {
+      e.preventDefault();
+      triggerKey(mapping[id], "keydown");
+    });
+    el.addEventListener("touchend", e => {
+      e.preventDefault();
+      triggerKey(mapping[id], "keyup");
+    });
+  });
+})();
+</script>
 </html>
