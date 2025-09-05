@@ -21,11 +21,13 @@ html {
 	text-rendering: optimizeSpeed;
 }
 body {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    margin: 0;
+	width: auto;
+	height: auto;
+	min-width: 100%;
+	min-height: 100%;
+	border: none;
+	margin: 0;
+	padding: 0;
 }
 div.menubar, div#GameBoy > div#gfx, div.window > div.button_rack, ul.menu {
 	-webkit-text-size-adjust: none;
@@ -56,10 +58,8 @@ div.window {
 	opacity: 1;
 }
 div#GameBoy {
-    display: block !important;
-    position: relative !important;
-    top: auto !important;
-    left: auto !important;
+	min-height: 340px;
+	min-width: 400px;
 }
 div#input_select, div#save_importer {
 	min-height: 100px;
@@ -450,26 +450,39 @@ ul.menu > li:hover > ul.menu {
 }
 
 .gb-controls {
-    width: 100%;
-    padding: 15px 0;
-    box-sizing: border-box;
+  display: block;
+  width: 100%; max-width: none; margin: 8px 0 0 0; box-sizing: border-box; text-align: center; -webkit-tap-highlight-color: rgba(0,0,0,0); font-family: Arial, sans-serif; touch-action: none;
+
+  max-width: 520px;
+  margin: 12px auto;
+  box-sizing: border-box;
+  text-align: center;
+  -webkit-tap-highlight-color: rgba(0,0,0,0);
+  font-family: Arial, sans-serif;
+  touch-action: none;
 }
 
 .gb-controls-inner {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 14px;
-    padding: 12px;
-    margin: 0 auto;
-    max-width: 380px;
-    background: #E0E0E0;
-    border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:14px;
+  padding: 8px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.85), rgba(240,240,240,0.85));
+  border-radius: 12px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.25);
+}
+.gb-select-start {
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  align-items:center;
+  justify-content:center;
 }
 
+
 .gb-dpad {
-  width: 38%;
+  width:  42%;
   display:flex;
   flex-direction:column;
   align-items:center;
@@ -477,12 +490,23 @@ ul.menu > li:hover > ul.menu {
 }
 
 .gb-dpad-middle {
-  gap:36px;
+  display:flex;
+  width:100%;
+  justify-content:space-between;
+  gap:6px;
+}
+
+.gb-action-buttons {
+  width: 48%;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:8px;
 }
 
 .gb-ab {
   display:flex;
-  gap:24px;
+  gap:20px;
   align-items:center;
   justify-content:center;
 }
@@ -518,15 +542,15 @@ ul.menu > li:hover > ul.menu {
 
 .gb-btn.gb-dpad-up,
 .gb-btn.gb-dpad-down {
-  width:56px;
-  height:44px;
+  width:52px;
+  height:40px;
   border-radius:8px;
 }
 
 .gb-btn.gb-dpad-left,
 .gb-btn.gb-dpad-right {
-  width:44px;
-  height:56px;
+  width:40px;
+  height:50px;
   border-radius:8px;
 }
 
@@ -536,31 +560,4 @@ ul.menu > li:hover > ul.menu {
   font-size: 13px;
   border-radius: 8px;
   background: linear-gradient(180deg,#eee,#ddd);
-}
-
-#game-container {
-    position: relative;
-    width: 400px;
-}
-
-.gb-middle-buttons {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-    align-items: center;
-}
-
-#GameBoy {
-    -webkit-border-radius: 10px 10px 3px 3px;
-    border-radius: 10px 10px 3px 3px;
-    -webkit-box-shadow: 5px 5px 10px rgb(30, 30, 30);
-    box-shadow: 5px 5px 10px rgb(30, 30, 30);
-    background-color: rgb(200, 200, 200);
-    padding-top: 10px;
-    position: relative;
-    min-height: 340px;
-    min-width: 400px;
-    box-sizing: border-box;
-    display: block;
-    overflow: hidden;
 }
