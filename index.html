@@ -1,64 +1,66 @@
 <!doctype html>
 <html lang="zh">
-    <head>
-        <link rel="stylesheet" href="/css/GameBoy.css">
-        <script type="text/javascript">
+<head>
+  <meta charset="utf-8">
+  <title>GameBoyColor</title>
+  <link rel="stylesheet" href="/css/GameBoy.css">
+
+  <script>
     var DEBUG_MESSAGES = false;
     var DEBUG_WINDOWING = false;
     window.onload = function () {
-        windowingInitialize();
+      windowingInitialize();
     }
-        </script>
-        <script type="text/javascript" src="js/other/windowStack.js"></script>
-        <script type="text/javascript" src="js/other/terminal.js"></script>
-        <script type="text/javascript" src="js/other/gui.js"></script>
-        <script type="text/javascript" src="js/other/base64.js"></script>
-        <script type="text/javascript" src="js/other/json2.js"></script>
-        <script type="text/javascript" src="js/other/swfobject.js"></script>
-        <script type="text/javascript" src="js/other/resampler.js"></script>
-        <script type="text/javascript" src="js/other/XAudioServer.js"></script>
-        <script type="text/javascript" src="js/other/resize.js"></script>
-        <script type="text/javascript" src="js/GameBoyCore.js"></script>
-        <script type="text/javascript" src="js/GameBoyIO.js"></script>
-        <title>GameBoyColor</title>
-    </head>
-    <body>
-        <div id="GameBoy" class="window">
-            <div class="menubar">
-                <span id="GameBoy_file_menu">文件</span>
-                <span id="GameBoy_settings_menu">设置</span>
-                <span id="GameBoy_view_menu">视图</span>
-                <span id="GameBoy_about_menu">关于</span>
-            </div>
-            <div id="gfx">
-                <canvas id="mainCanvas"></canvas>
-                <span id="title">GameBoy</span>
-                <span id="port_title">Online</span>
-            </div>
-        
+  </script>
+
+  <script src="js/other/windowStack.js"></script>
+  <script src="js/other/terminal.js"></script>
+  <script src="js/other/gui.js"></script>
+  <script src="js/other/base64.js"></script>
+  <script src="js/other/json2.js"></script>
+  <script src="js/other/swfobject.js"></script>
+  <script src="js/other/resampler.js"></script>
+  <script src="js/other/XAudioServer.js"></script>
+  <script src="js/other/resize.js"></script>
+  <script src="js/GameBoyCore.js"></script>
+  <script src="js/GameBoyIO.js"></script>
+</head>
+<body>
+  <div id="GameBoy" class="window">
+    <div class="menubar">
+      <span id="GameBoy_file_menu">文件</span>
+      <span id="GameBoy_settings_menu">设置</span>
+      <span id="GameBoy_view_menu">视图</span>
+      <span id="GameBoy_about_menu">关于</span>
+    </div>
+
+    <div id="gfx">
+      <canvas id="mainCanvas"></canvas>
+      <span id="title">GameBoy</span>
+      <span id="port_title">Online</span>
+    </div>
+
     <div id="gb-virtual-controls" class="gb-controls">
-          <div class="gb-controls-inner">
-            <div class="gb-dpad" role="group" aria-label="D-Pad">
-              <button id="gb-btn-up" class="gb-btn gb-dpad-up" aria-label="Up"></button>
-              <div class="gb-dpad-middle">
-                <button id="gb-btn-left" class="gb-btn gb-dpad-left" aria-label="Left"></button>
-                <button id="gb-btn-right" class="gb-btn gb-dpad-right" aria-label="Right"></button>
-              </div>
-              <button id="gb-btn-down" class="gb-btn gb-dpad-down" aria-label="Down"></button>
-            </div>
-            <div class="gb-action-buttons" role="group" aria-label="Action Buttons">
-              <div class="gb-select-start">
-                <button id="gb-btn-select" class="gb-btn gb-select" aria-label="Select">SELECT</button>
-                <button id="gb-btn-start" class="gb-btn gb-start" aria-label="Start">START</button>
-              </div>
-              <div class="gb-ab">
-                <button id="gb-btn-b" class="gb-btn gb-b" aria-label="B">B</button>
-                <button id="gb-btn-a" class="gb-btn gb-a" aria-label="A">A</button>
-              </div>
-            </div>
+      <div class="gb-controls-inner">
+        <div class="gb-dpad" role="group" aria-label="D-Pad">
+          <button id="gb-btn-up" class="gb-btn gb-dpad-up" aria-label="Up"></button>
+          <div class="gb-dpad-middle">
+            <button id="gb-btn-left" class="gb-btn gb-dpad-left" aria-label="Left"></button>
+            <button id="gb-btn-right" class="gb-btn gb-dpad-right" aria-label="Right"></button>
           </div>
+          <button id="gb-btn-down" class="gb-btn gb-dpad-down" aria-label="Down"></button>
         </div>
-</div>
+        <div class="gb-select-start" role="group">
+          <button id="gb-btn-select" class="gb-btn gb-select" aria-label="Select">SELECT</button>
+          <button id="gb-btn-start" class="gb-btn gb-start" aria-label="Start">START</button>
+        </div>
+        <div class="gb-ab" role="group" aria-label="Action Buttons">
+          <button id="gb-btn-b" class="gb-btn gb-b" aria-label="B">B</button>
+          <button id="gb-btn-a" class="gb-btn gb-a" aria-label="A">A</button>
+        </div>
+      </div>
+    </div>
+  </div>
         
         <div id="terminal" class="window">
             <div id="terminal_output"></div>
@@ -229,6 +231,6 @@
         <div id="fullscreenContainer">
             <canvas id="fullscreen" class="maximum"></canvas>
         </div>
-      <script type="text/javascript" src="js/other/onscreen-controls.js"></script>
+      <script src="js/other/onscreen-controls.js"></script>
 </body>
 </html>
