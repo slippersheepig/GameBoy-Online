@@ -611,3 +611,39 @@ ul.menu > li:hover > ul.menu {
 .gb-btn:active {
   background: #aaa;
 }
+
+/* --- Added overrides to keep on-screen controls visible and horizontal --- */
+#gb-virtual-controls, .gb-controls {
+  display: block !important;
+  position: fixed !important;
+  left: 50% !important;
+  bottom: 18px !important;
+  transform: translateX(-50%) !important;
+  z-index: 9999 !important;
+  width: 90% !important;
+  max-width: 520px !important;
+  margin: 0 auto !important;
+  box-sizing: border-box !important;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+/* Ensure SELECT and START are horizontal */
+.gb-select-start {
+  display: flex !important;
+  flex-direction: row !important;
+  justify-content: center !important;
+  align-items: center !important;
+  gap: 20px !important;
+}
+
+/* Make sure D-PAD keeps its column layout but won't overlap */
+.gb-dpad { z-index: 10000 !important; }
+
+/* keep buttons interactive */
+.gb-btn { pointer-events: auto !important; user-select: none !important; -webkit-user-select: none !important; }
+
+/* Reduce the chance of being obscured by other .window elements */
+div.window { z-index: 2; }
+/* On-screen controls must be above window elements */
+#gb-virtual-controls { z-index: 10001; }
