@@ -10,17 +10,17 @@
         windowingInitialize();
     }
         </script>
-        <script type="text/javascript" src="js/other/windowStack.js"/>
-        <script type="text/javascript" src="js/other/terminal.js"/>
-        <script type="text/javascript" src="js/other/gui.js"/>
-        <script type="text/javascript" src="js/other/base64.js"/>
-        <script type="text/javascript" src="js/other/json2.js"/>
-        <script type="text/javascript" src="js/other/swfobject.js"/>
-        <script type="text/javascript" src="js/other/resampler.js"/>
-        <script type="text/javascript" src="js/other/XAudioServer.js"/>
-        <script type="text/javascript" src="js/other/resize.js"/>
-        <script type="text/javascript" src="js/GameBoyCore.js"/>
-        <script type="text/javascript" src="js/GameBoyIO.js"/>
+        <script type="text/javascript" src="js/other/windowStack.js"></script>
+        <script type="text/javascript" src="js/other/terminal.js"></script>
+        <script type="text/javascript" src="js/other/gui.js"></script>
+        <script type="text/javascript" src="js/other/base64.js"></script>
+        <script type="text/javascript" src="js/other/json2.js"></script>
+        <script type="text/javascript" src="js/other/swfobject.js"></script>
+        <script type="text/javascript" src="js/other/resampler.js"></script>
+        <script type="text/javascript" src="js/other/XAudioServer.js"></script>
+        <script type="text/javascript" src="js/other/resize.js"></script>
+        <script type="text/javascript" src="js/GameBoyCore.js"></script>
+        <script type="text/javascript" src="js/GameBoyIO.js"></script>
         <title>GameBoyColor</title>
     </head>
     <body>
@@ -36,9 +36,9 @@
                 <span id="title">GameBoy</span>
                 <span id="port_title">Online</span>
             </div>
-        </div>
         <div id="gb-virtual-controls" class="gb-controls">
           <div class="gb-controls-inner">
+            <div class="gb-left">
             <div class="gb-dpad" role="group" aria-label="D-Pad">
               <button id="gb-btn-up" class="gb-btn gb-dpad-up" aria-label="Up"></button>
               <div class="gb-dpad-middle">
@@ -47,15 +47,15 @@
               </div>
               <button id="gb-btn-down" class="gb-btn gb-dpad-down" aria-label="Down"></button>
             </div>
-            <div class="gb-action-buttons" role="group" aria-label="Action Buttons">
-              <button id="gb-btn-select" class="gb-btn gb-select" aria-label="Select">SELECT</button>
-              <div class="gb-ab">
-                <button id="gb-btn-b" class="gb-btn gb-b" aria-label="B">B</button>
-                <button id="gb-btn-a" class="gb-btn gb-a" aria-label="A">A</button>
-              </div>
-              <button id="gb-btn-start" class="gb-btn gb-start" aria-label="Start">START</button>
+            <button id="gb-btn-select" class="gb-btn gb-select" aria-label="Select">SELECT</button>
+            <button id="gb-btn-start"  class="gb-btn gb-start"  aria-label="Start">START</button>
+            </div>
+            <div class="gb-ab" role="group" aria-label="Action Buttons">
+              <button id="gb-btn-b" class="gb-btn gb-b" aria-label="B">B</button>
+              <button id="gb-btn-a" class="gb-btn gb-a" aria-label="A">A</button>
             </div>
           </div>
+        </div>
         </div>
         <div id="terminal" class="window">
             <div id="terminal_output"/>
