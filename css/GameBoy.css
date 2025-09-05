@@ -449,26 +449,106 @@ ul.menu > li:hover > ul.menu {
 	display: inline-block;
 }
 
-/* --- On-screen virtual controls (mobile only) --- */
-.gb-controls { display: none; font-family: Arial, sans-serif; }
-@media (max-width: 900px) and (pointer: coarse) {
-  .gb-controls { display: block; width: 90%; max-width: 520px; margin: 12px auto; box-sizing: border-box; text-align: center; -webkit-tap-highlight-color: rgba(0,0,0,0); }
-  .gb-controls-inner { display:flex; justify-content:space-between; align-items:center; gap:14px; padding: 8px; background: linear-gradient(180deg, rgba(255,255,255,0.85), rgba(240,240,240,0.85)); border-radius: 12px; box-shadow: 0 6px 18px rgba(0,0,0,0.25); }
-  .gb-dpad { width: 48%; display:flex; flex-direction:column; align-items:center; gap:6px; }
-  .gb-dpad-middle { display:flex; width:100%; justify-content:space-between; gap:6px; }
-  .gb-action-buttons { width: 48%; display:flex; flex-direction:column; align-items:center; gap:8px; }
-  .gb-ab { display:flex; gap:12px; align-items:center; justify-content:center; }
-  .gb-btn { -webkit-user-select: none; user-select: none; border: none; outline: none; cursor: pointer; background: linear-gradient(180deg,#f7f7f7,#e0e0e0); padding: 6px; box-shadow: 0 6px 0 rgba(0,0,0,0.18); border-radius: 10px; font-weight: 700; }
-  .gb-btn:active { transform: translateY(3px); box-shadow: 0 3px 0 rgba(0,0,0,0.12); }
-  .gb-btn.gb-a, .gb-btn.gb-b { width:64px; height:64px; border-radius: 50%; font-size: 18px; display:flex; align-items:center; justify-content:center; }
-  .gb-btn.gb-dpad-up, .gb-btn.gb-dpad-down { width:56px; height:44px; border-radius:8px; }
-  .gb-btn.gb-dpad-left, .gb-btn.gb-dpad-right { width:44px; height:56px; border-radius:8px; }
-  .gb-btn.gb-select, .gb-btn.gb-start { padding: 6px 14px; font-size: 13px; border-radius: 8px; background: linear-gradient(180deg,#eee,#ddd); }
-  /* Make control bar slightly narrower than the game window by default because it's 90% */
-  /* Ensure controls don't interfere with page scroll */
-  .gb-controls { touch-action: none; }
+.gb-controls {
+  display: block;
+  width: 90%;
+  max-width: 520px;
+  margin: 12px auto;
+  box-sizing: border-box;
+  text-align: center;
+  -webkit-tap-highlight-color: rgba(0,0,0,0);
+  font-family: Arial, sans-serif;
+  touch-action: none;
 }
-/* Hide controls on wider screens (desktop/laptop) */
-@media (min-width: 901px) {
-  .gb-controls { display: none !important; }
+
+.gb-controls-inner {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:14px;
+  padding: 8px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.85), rgba(240,240,240,0.85));
+  border-radius: 12px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.25);
+}
+
+.gb-dpad {
+  width: 48%;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:6px;
+}
+
+.gb-dpad-middle {
+  display:flex;
+  width:100%;
+  justify-content:space-between;
+  gap:6px;
+}
+
+.gb-action-buttons {
+  width: 48%;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:8px;
+}
+
+.gb-ab {
+  display:flex;
+  gap:12px;
+  align-items:center;
+  justify-content:center;
+}
+
+.gb-btn {
+  -webkit-user-select: none;
+  user-select: none;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  background: linear-gradient(180deg,#f7f7f7,#e0e0e0);
+  padding: 6px;
+  box-shadow: 0 6px 0 rgba(0,0,0,0.18);
+  border-radius: 10px;
+  font-weight: 700;
+}
+
+.gb-btn:active {
+  transform: translateY(3px);
+  box-shadow: 0 3px 0 rgba(0,0,0,0.12);
+}
+
+.gb-btn.gb-a,
+.gb-btn.gb-b {
+  width:64px;
+  height:64px;
+  border-radius: 50%;
+  font-size: 18px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.gb-btn.gb-dpad-up,
+.gb-btn.gb-dpad-down {
+  width:56px;
+  height:44px;
+  border-radius:8px;
+}
+
+.gb-btn.gb-dpad-left,
+.gb-btn.gb-dpad-right {
+  width:44px;
+  height:56px;
+  border-radius:8px;
+}
+
+.gb-btn.gb-select,
+.gb-btn.gb-start {
+  padding: 6px 14px;
+  font-size: 13px;
+  border-radius: 8px;
+  background: linear-gradient(180deg,#eee,#ddd);
 }
