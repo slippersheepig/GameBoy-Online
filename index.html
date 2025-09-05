@@ -228,41 +228,76 @@
         </div>
       <script src="js/other/onscreen-controls.js"></script>
 
-      <script>
-      (function(){
-        function updateControlsPosition(){
-          var game = document.getElementById('GameBoy');
-          var controls = document.getElementById('gb-virtual-controls');
-          if (!game || !controls) return;
-          var r = game.getBoundingClientRect();
-          if (r.width === 0 && r.height === 0) { controls.style.display = 'none'; return; }
-          controls.style.display = 'block';
-          var left = Math.round(r.left + (window.pageXOffset || document.documentElement.scrollLeft || 0));
-          var top  = Math.round(r.bottom + (window.pageYOffset || document.documentElement.scrollTop || 0) + 8);
-          controls.style.position = 'absolute';
-          controls.style.left = left + 'px';
-          controls.style.top  = top  + 'px';
-          var targetWidth = Math.min(Math.max(Math.round(r.width), 220), 520);
-          controls.style.width = targetWidth + 'px';
-          controls.style.maxWidth = targetWidth + 'px';
-          controls.style.transform = 'none';
-          controls.style.zIndex = '10001';
+<script>
+(function(){
+  var game = document.getElementById('GameBoy');
+  var controls = document.getElementById('gb-virtual-controls');
+  if (!game || !controls) return;
+  var lastRect = null;
+  function applyPos(rect){
+    var left = Math.round(rect.left + (window.pageXOffset || document.documentElement.scrollLeft || 0));
+    var top  = Math.round(rect.bottom + (window.pageYOffset || document.documentElement.scrollTop || 0) + 8);
+    var targetWidth = Math.min(Math.max(Math.round(rect.width), 220), 520);
+    controls.style.setProperty('position', 'absolute', 'important');
+    controls.style.setProperty('left', left + 'px', 'important');
+    controls.style.setProperty('top',  top  + 'px', 'important');
+    controls.style.setProperty('width', targetWidth + 'px', 'important');
+    controls.style.setProperty('max-width', targetWidth + 'px', 'important');
+    controls.style.setProperty('display', 'block', 'important');
+    controls.style.setProperty('transform', 'none', 'important');
+    controls.style.setProperty('z-index', '10001', 'important');
+  }
+  function updateIfNeeded(){
+    var r = game.getBoundingClientRect();
+    if (r.width === 0 && r.height === 0) {
+      controls.style.setProperty('display', 'none', 'important');
+      lastRect = null;
+      return;
+    }
+    if (!lastRect ||
+        r.left !== lastRect.left ||
+        r.top !== lastRect.top ||
+        r.width !== lastRect.width ||
+        r.height !== lastRect.height ||
+        r.bottom !== lastRect.bottom) {
+      applyPos(r);
+      lastRect = { left: r.left, top: r.top, width: r.width, height: r.height, bottom: r.bottom };
+    }
+  }
+  if (window.ResizeObserver) {
+    try {
+      var ro = new ResizeObserver(function(){ updateIfNeeded(); });
+      ro.observe(game);
+    } catch(e){}
+  }
+  try {
+    var ctrlObserver = new MutationObserver(function(muts){
+      for (var i=0;i<muts.length;i++){
+        var m = muts[i];
+        if (m.type === 'attributes' && (m.attributeName === 'style' || m.attributeName === 'class')) {
+          setTimeout(updateIfNeeded, 0);
+          break;
         }
-        function delayedUpdate() {
-          updateControlsPosition();
-          setTimeout(updateControlsPosition, 120);
-          setTimeout(updateControlsPosition, 450);
-          setTimeout(updateControlsPosition, 1200);
-        }
-        window.addEventListener('load', delayedUpdate);
-        window.addEventListener('resize', updateControlsPosition);
-        window.addEventListener('scroll', updateControlsPosition);
-        try {
-          var observer = new MutationObserver(function(){ updateControlsPosition(); });
-          observer.observe(document.body, { attributes: true, childList: true, subtree: true });
-        } catch (e) {}
-        updateControlsPosition();
-      })();
-      </script>
+      }
+    });
+    ctrlObserver.observe(controls, { attributes: true, attributeFilter: ['style','class'] });
+    var bodyObserver = new MutationObserver(function(){ setTimeout(updateIfNeeded, 0); });
+    bodyObserver.observe(document.body, { attributes: true, childList: true, subtree: true });
+  } catch(e){}
+  window.addEventListener('load', function(){ setTimeout(updateIfNeeded, 20); });
+  window.addEventListener('resize', function(){ updateIfNeeded(); });
+  window.addEventListener('scroll', function(){ updateIfNeeded(); });
+  var checks = 0;
+  var poll = setInterval(function(){
+    updateIfNeeded();
+    checks++;
+    if (checks > 15) clearInterval(poll);
+  }, 200);
+  updateIfNeeded();
+  setTimeout(updateIfNeeded, 60);
+  setTimeout(updateIfNeeded, 200);
+  setTimeout(updateIfNeeded, 800);
+})();
+</script>
 </body>
 </html>
