@@ -227,5 +227,36 @@
             <canvas id="fullscreen" class="maximum"></canvas>
         </div>
       <script src="js/other/onscreen-controls.js"></script>
+
+      <!-- Position & sizing helper for on-screen controls: place them just below #GameBoy and match width -->
+      <script>
+      (function(){
+        function updateControlsPosition(){
+          var game = document.getElementById('GameBoy');
+          var controls = document.getElementById('gb-virtual-controls');
+          if (!game || !controls) return;
+          var r = game.getBoundingClientRect();
+          // if GameBoy is not visible yet
+          if (r.width === 0 && r.height === 0) { controls.style.display='none'; return; }
+          controls.style.display='block';
+          controls.style.position='absolute';
+          // use page coordinates so controls follow scroll
+          controls.style.left = (window.scrollX + r.left) + 'px';
+          controls.style.top  = (window.scrollY + r.bottom + 8) + 'px';
+          // make width match the game window (but don't exceed 520px as before)
+          var targetWidth = Math.min(r.width, 520);
+          controls.style.width = targetWidth + 'px';
+          controls.style.maxWidth = targetWidth + 'px';
+          controls.style.transform = 'none';
+          controls.style.zIndex = 10001;
+        }
+        window.addEventListener('load', function(){ setTimeout(updateControlsPosition, 120); updateControlsPosition(); });
+        window.addEventListener('resize', updateControlsPosition);
+        window.addEventListener('scroll', updateControlsPosition);
+        // small delayed calls to catch windowing scripts that might toggle visibility
+        setTimeout(updateControlsPosition, 500);
+        setTimeout(updateControlsPosition, 1500);
+      })();
+      </script>
 </body>
 </html>
