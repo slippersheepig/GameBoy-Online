@@ -449,16 +449,10 @@ ul.menu > li:hover > ul.menu {
 #gb-virtual-controls {
   display: block;
   position: absolute;
-  left: 0;
-  top: 0;
   z-index: 10001;
-  width: auto;
-  max-width: 520px;
-  margin: 0 auto;
   box-sizing: border-box;
-  -webkit-tap-highlight-color: transparent;
-  touch-action: manipulation;
   pointer-events: auto;
+  max-width: 520px;
   background: transparent;
 }
 
@@ -466,8 +460,8 @@ ul.menu > li:hover > ul.menu {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 10px;
-  padding: 8px;
+  gap: 8px;
+  padding: 6px;
   background: linear-gradient(180deg, rgba(255,255,255,0.90), rgba(240,240,240,0.85));
   border-radius: 12px;
   box-shadow: 0 6px 18px rgba(0,0,0,0.22);
@@ -478,11 +472,12 @@ ul.menu > li:hover > ul.menu {
 .gb-controls-row {
   width: 100%;
   display: flex;
+  flex-direction: row;
+  align-items: center;
   justify-content: space-between;
-  align-items: flex-start;
   gap: 12px;
   box-sizing: border-box;
-  padding: 2px 6px;
+  flex-wrap: nowrap;
 }
 
 .gb-dpad {
@@ -494,7 +489,10 @@ ul.menu > li:hover > ul.menu {
   grid-template-columns: 1fr auto 1fr;
   grid-template-rows: auto auto auto;
   gap: 8px;
+  flex: 0 0 auto;
   width: 160px;
+  max-width: 60%;
+  min-width: 120px;
   height: 160px;
   place-items: center;
   box-sizing: border-box;
@@ -535,7 +533,9 @@ ul.menu > li:hover > ul.menu {
   gap: 12px;
   align-items: center;
   justify-content: center;
-  min-width: 120px;
+  flex: 0 0 auto;
+  min-width: 72px;
+  max-width: 140px;
   box-sizing: border-box;
 }
 
@@ -592,7 +592,7 @@ ul.menu > li:hover > ul.menu {
 }
 
 @media (max-width: 420px) {
-  .gb-dpad { width: 132px; height: 132px; gap: 6px; }
+  .gb-dpad { width: 132px; height: 132px; gap: 6px; min-width: 96px; }
   .gb-dpad-up, .gb-dpad-down { width: 48px; height: 36px; }
   .gb-dpad-left, .gb-dpad-right { width: 36px; height: 48px; }
   .gb-btn.gb-a, .gb-btn.gb-b { width: 56px; height: 56px; font-size: 16px; }
