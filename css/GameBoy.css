@@ -611,57 +611,73 @@ ul.menu > li:hover > ul.menu {
 
 #gb-virtual-controls, .gb-controls {
   display: block;
-  position: absolute;
-  left: 0;
-  top: 0;
-  z-index: 10001;
-  width: auto;
-  max-width: 520px;
-  margin: 0 auto;
-  box-sizing: border-box;
+  position: absolute !important;
+  left: 0 !important;
+  top: 0 !important;
+  z-index: 10001 !important;
+  width: auto !important;
+  max-width: 520px !important;
+  margin: 0 auto !important;
+  box-sizing: border-box !important;
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
-  pointer-events: auto;
+  pointer-events: auto !important;
+  transform: none !important;
 }
 
-.gb-dpad button {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #fff;
-  color: #000;
-  border: 2px solid #888;
-  box-shadow: 0 4px 0 rgba(0,0,0,0.12);
+.gb-dpad button.gb-btn {
+  background: #fff !important;
+  color: #000 !important;
+  border: 2px solid #666 !important;
+  box-shadow: 0 4px 0 rgba(0,0,0,0.12) !important;
+  padding: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
 }
-.gb-dpad button::before {
-  font-size: 20px;
-  line-height: 1;
+
+.gb-btn.gb-dpad-up, .gb-btn.gb-dpad-down {
+  width: 56px !important;
+  height: 44px !important;
+  border-radius: 8px !important;
 }
-.gb-dpad-up::before    { content: '▲'; }
-.gb-dpad-down::before  { content: '▼'; }
-.gb-dpad-left::before  { content: '◄'; }
-.gb-dpad-right::before { content: '►'; }
-
-.gb-btn.gb-select, .gb-btn.gb-start {
-  width: 72px;
-  height: 40px;
-  border-radius: 8px;
-  font-size: 13px;
-  padding: 6px;
-  box-shadow: 0 6px 0 rgba(0,0,0,0.18);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+.gb-btn.gb-dpad-left, .gb-btn.gb-dpad-right {
+  width: 44px !important;
+  height: 56px !important;
+  border-radius: 8px !important;
 }
-.gb-select-start { margin-top: 44px; gap: 24px; }
 
-.gb-btn.gb-a, .gb-btn.gb-b { width:64px; height:64px; }
+.gb-dpad button svg {
+  width: 60%;
+  height: 60%;
+  display: block;
+}
 
-div.window { z-index: 2; }
-#gb-virtual-controls { z-index: 10001; }
+.gb-btn.gb-select,
+.gb-btn.gb-start {
+  width: 72px !important;
+  height: 40px !important;
+  border-radius: 8px !important;
+  font-size: 13px !important;
+  padding: 6px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.gb-select-start {
+  margin-top: 44px !important;
+  gap: 24px !important;
+}
+
+.gb-btn.gb-a,
+.gb-btn.gb-b {
+  width: 64px !important;
+  height: 64px !important;
+}
 
 @media (max-width: 420px) {
-  .gb-controls-inner { gap: 8px; padding: 6px; }
-  .gb-btn.gb-a, .gb-btn.gb-b { width:56px; height:56px; }
-  .gb-btn.gb-select, .gb-btn.gb-start { width: 60px; height: 36px; }
+  .gb-btn.gb-a, .gb-btn.gb-b { width:56px !important; height:56px !important; }
+  .gb-btn.gb-select, .gb-btn.gb-start { width:60px !important; height:36px !important; }
+  .gb-dpad button svg { width: 56%; height: 56%; }
 }
