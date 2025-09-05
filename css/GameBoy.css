@@ -28,6 +28,7 @@ body {
 	border: none;
 	margin: 0;
 	padding: 0;
+	text-align: center;
 }
 div.menubar, div#GameBoy > div#gfx, div.window > div.button_rack, ul.menu {
 	-webkit-text-size-adjust: none;
@@ -41,7 +42,9 @@ div.menubar, div#GameBoy > div#gfx, div.window > div.button_rack, ul.menu {
 div.window {
 	visibility: visible;
 	display: none;
-	position: absolute;
+	position: relative;
+	display: inline-block;
+    margin-bottom: 12px;
 	overflow: hidden;
 	margin: 0;
 	padding: 10px 0px 0px 0px;
