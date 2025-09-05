@@ -41,10 +41,10 @@
       <div class="gb-controls-inner">
         <div class="gb-controls-row">
           <div class="gb-dpad" role="group" aria-label="D-Pad">
-            <button id="gb-btn-up" class="gb-btn gb-dpad-up" aria-label="Up">▲</button>
-            <button id="gb-btn-left" class="gb-btn gb-dpad-left" aria-label="Left">◄</button>
+            <button id="gb-btn-up"    class="gb-btn gb-dpad-up"    aria-label="Up">▲</button>
+            <button id="gb-btn-left"  class="gb-btn gb-dpad-left"  aria-label="Left">◄</button>
             <button id="gb-btn-right" class="gb-btn gb-dpad-right" aria-label="Right">►</button>
-            <button id="gb-btn-down" class="gb-btn gb-dpad-down" aria-label="Down">▼</button>
+            <button id="gb-btn-down"  class="gb-btn gb-dpad-down"  aria-label="Down">▼</button>
           </div>
           <div class="gb-ab" role="group" aria-label="Action Buttons">
             <button id="gb-btn-b" class="gb-btn gb-b" aria-label="B">B</button>
@@ -53,7 +53,7 @@
         </div>
         <div class="gb-select-start" role="group" aria-label="Select Start">
           <button id="gb-btn-select" class="gb-btn gb-select" aria-label="Select">SELECT</button>
-          <button id="gb-btn-start" class="gb-btn gb-start" aria-label="Start">START</button>
+          <button id="gb-btn-start"  class="gb-btn gb-start"  aria-label="Start">START</button>
         </div>
       </div>
     </div>
@@ -228,7 +228,6 @@
         </div>
       <script src="js/other/onscreen-controls.js"></script>
 
-      <!-- Position & sizing helper for on-screen controls: place them just below #GameBoy and match width -->
       <script>
       (function(){
         function updateControlsPosition(){
@@ -236,26 +235,33 @@
           var controls = document.getElementById('gb-virtual-controls');
           if (!game || !controls) return;
           var r = game.getBoundingClientRect();
-          // if GameBoy is not visible yet
-          if (r.width === 0 && r.height === 0) { controls.style.display='none'; return; }
-          controls.style.display='block';
-          controls.style.position='absolute';
-          // use page coordinates so controls follow scroll
-          controls.style.left = (window.scrollX + r.left) + 'px';
-          controls.style.top  = (window.scrollY + r.bottom + 8) + 'px';
-          // make width match the game window (but don't exceed 520px as before)
-          var targetWidth = Math.min(r.width, 520);
+          if (r.width === 0 && r.height === 0) { controls.style.display = 'none'; return; }
+          controls.style.display = 'block';
+          var left = Math.round(r.left + (window.pageXOffset || document.documentElement.scrollLeft || 0));
+          var top  = Math.round(r.bottom + (window.pageYOffset || document.documentElement.scrollTop || 0) + 8);
+          controls.style.position = 'absolute';
+          controls.style.left = left + 'px';
+          controls.style.top  = top  + 'px';
+          var targetWidth = Math.min(Math.max(Math.round(r.width), 220), 520);
           controls.style.width = targetWidth + 'px';
           controls.style.maxWidth = targetWidth + 'px';
           controls.style.transform = 'none';
-          controls.style.zIndex = 10001;
+          controls.style.zIndex = '10001';
         }
-        window.addEventListener('load', function(){ setTimeout(updateControlsPosition, 120); updateControlsPosition(); });
+        function delayedUpdate() {
+          updateControlsPosition();
+          setTimeout(updateControlsPosition, 120);
+          setTimeout(updateControlsPosition, 450);
+          setTimeout(updateControlsPosition, 1200);
+        }
+        window.addEventListener('load', delayedUpdate);
         window.addEventListener('resize', updateControlsPosition);
         window.addEventListener('scroll', updateControlsPosition);
-        // small delayed calls to catch windowing scripts that might toggle visibility
-        setTimeout(updateControlsPosition, 500);
-        setTimeout(updateControlsPosition, 1500);
+        try {
+          var observer = new MutationObserver(function(){ updateControlsPosition(); });
+          observer.observe(document.body, { attributes: true, childList: true, subtree: true });
+        } catch (e) {}
+        updateControlsPosition();
       })();
       </script>
 </body>
