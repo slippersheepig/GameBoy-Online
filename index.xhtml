@@ -1,6 +1,5 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-US">
+<!doctype html>
+<html lang="zh">
     <head>
         <style type="text/css">@import url(&quot;css/GameBoy.css&quot;);</style>
         <script type="text/javascript">
@@ -24,8 +23,7 @@
         <title>GameBoyColor</title>
     </head>
     <body>
-      <div id="game-container">
-        <div id="GameBoy">
+        <div id="GameBoy" class="window">
             <div class="menubar">
                 <span id="GameBoy_file_menu">文件</span>
                 <span id="GameBoy_settings_menu">设置</span>
@@ -33,34 +31,37 @@
                 <span id="GameBoy_about_menu">关于</span>
             </div>
             <div id="gfx">
-                <canvas id="mainCanvas"/>
+                <canvas id="mainCanvas"></canvas>
                 <span id="title">GameBoy</span>
                 <span id="port_title">Online</span>
             </div>
-        <div id="gb-virtual-controls" class="gb-controls">
+        
+    <div id="gb-virtual-controls" class="gb-controls">
           <div class="gb-controls-inner">
-              <div class="gb-dpad" role="group" aria-label="D-Pad">
-                  <button id="gb-btn-up" class="gb-btn gb-dpad-up" aria-label="Up"></button>
-                  <div class="gb-dpad-middle">
-                      <button id="gb-btn-left" class="gb-btn gb-dpad-left" aria-label="Left"></button>
-                      <button id="gb-btn-right" class="gb-btn gb-dpad-right" aria-label="Right"></button>
-                  </div>
-                  <button id="gb-btn-down" class="gb-btn gb-dpad-down" aria-label="Down"></button>
+            <div class="gb-dpad" role="group" aria-label="D-Pad">
+              <button id="gb-btn-up" class="gb-btn gb-dpad-up" aria-label="Up"></button>
+              <div class="gb-dpad-middle">
+                <button id="gb-btn-left" class="gb-btn gb-dpad-left" aria-label="Left"></button>
+                <button id="gb-btn-right" class="gb-btn gb-dpad-right" aria-label="Right"></button>
               </div>
-              <div class="gb-middle-buttons">
-                  <button id="gb-btn-select" class="gb-btn gb-select" aria-label="Select">SELECT</button>
-                  <button id="gb-btn-start"  class="gb-btn gb-start"  aria-label="Start">START</button>
+              <button id="gb-btn-down" class="gb-btn gb-dpad-down" aria-label="Down"></button>
+            </div>
+            <div class="gb-action-buttons" role="group" aria-label="Action Buttons">
+              <div class="gb-select-start">
+                <button id="gb-btn-select" class="gb-btn gb-select" aria-label="Select">SELECT</button>
+                <button id="gb-btn-start" class="gb-btn gb-start" aria-label="Start">START</button>
               </div>
-              <div class="gb-ab" role="group" aria-label="Action Buttons">
-                  <button id="gb-btn-b" class="gb-btn gb-b" aria-label="B">B</button>
-                  <button id="gb-btn-a" class="gb-btn gb-a" aria-label="A">A</button>
+              <div class="gb-ab">
+                <button id="gb-btn-b" class="gb-btn gb-b" aria-label="B">B</button>
+                <button id="gb-btn-a" class="gb-btn gb-a" aria-label="A">A</button>
               </div>
+            </div>
           </div>
         </div>
-        </div>
-      </div>
+</div>
+        
         <div id="terminal" class="window">
-            <div id="terminal_output"/>
+            <div id="terminal_output"></div>
             <div class="button_rack">
                 <button id="terminal_clear_button" class="left">清除消息</button>
                 <button id="terminal_close_button" class="right">关闭终端</button>
@@ -177,7 +178,7 @@
         </div>
         <div class="window" id="local_storage_listing">
             <div id="storageListingMasterContainer" class="storageList">
-                <div id="storageListingMasterContainerSub"/>
+                <div id="storageListingMasterContainerSub"></div>
             </div>
             <div id="download_all_storage">
                 <a href="about:blank" id="download_local_storage_dba">导出所有存档。</a>
@@ -189,7 +190,7 @@
         </div>
         <div class="window" id="local_storage_popup">
             <div id="storagePopupMasterParent" class="storageList">
-                <div id="storagePopupMasterContainer"/>
+                <div id="storagePopupMasterContainer"></div>
             </div>
             <div class="button_rack">
                 <button id="local_storage_popup_close_button" class="center">关闭存储弹窗</button>
@@ -197,7 +198,7 @@
         </div>
         <div class="window" id="freeze_listing">
             <div id="freezeListingMasterContainer" class="storageList">
-                <div id="freezeListingMasterContainerSub"/>
+                <div id="freezeListingMasterContainerSub"></div>
             </div>
             <div class="button_rack">
                 <button id="freeze_list_refresh_button" class="left">刷新列表</button>
@@ -226,7 +227,7 @@
             <li id="view_fullscreen">全屏模式</li>
         </ul>
         <div id="fullscreenContainer">
-            <canvas id="fullscreen" class="maximum"/>
+            <canvas id="fullscreen" class="maximum"></canvas>
         </div>
       <script type="text/javascript" src="js/other/onscreen-controls.js"></script>
 </body>
