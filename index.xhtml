@@ -37,6 +37,27 @@
                 <span id="port_title">Online</span>
             </div>
         </div>
+        <!-- On-screen GameBoy-style controls (added for mobile only) -->
+        <div id="gb-virtual-controls" class="gb-controls" aria-hidden="true">
+          <div class="gb-controls-inner">
+            <div class="gb-dpad" role="group" aria-label="D-Pad">
+              <button id="gb-btn-up" class="gb-btn gb-dpad-up" aria-label="Up"></button>
+              <div class="gb-dpad-middle">
+                <button id="gb-btn-left" class="gb-btn gb-dpad-left" aria-label="Left"></button>
+                <button id="gb-btn-right" class="gb-btn gb-dpad-right" aria-label="Right"></button>
+              </div>
+              <button id="gb-btn-down" class="gb-btn gb-dpad-down" aria-label="Down"></button>
+            </div>
+            <div class="gb-action-buttons" role="group" aria-label="Action Buttons">
+              <button id="gb-btn-select" class="gb-btn gb-select" aria-label="Select">SELECT</button>
+              <div class="gb-ab">
+                <button id="gb-btn-b" class="gb-btn gb-b" aria-label="B">B</button>
+                <button id="gb-btn-a" class="gb-btn gb-a" aria-label="A">A</button>
+              </div>
+              <button id="gb-btn-start" class="gb-btn gb-start" aria-label="Start">START</button>
+            </div>
+          </div>
+        </div>
         <div id="terminal" class="window">
             <div id="terminal_output"/>
             <div class="button_rack">
@@ -206,5 +227,6 @@
         <div id="fullscreenContainer">
             <canvas id="fullscreen" class="maximum"/>
         </div>
-    </body>
+      <script type="text/javascript" src="js/other/onscreen-controls.js"></script>
+</body>
 </html>
