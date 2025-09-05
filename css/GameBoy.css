@@ -472,8 +472,16 @@ ul.menu > li:hover > ul.menu {
   box-shadow: 0 6px 18px rgba(0,0,0,0.25);
 }
 
-.gb-dpad {
+.gb-left {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
   width: 48%;
+}
+
+.gb-dpad {
+  width: 38%;
   display:flex;
   flex-direction:column;
   align-items:center;
@@ -497,7 +505,7 @@ ul.menu > li:hover > ul.menu {
 
 .gb-ab {
   display:flex;
-  gap:12px;
+  gap:24px;
   align-items:center;
   justify-content:center;
 }
