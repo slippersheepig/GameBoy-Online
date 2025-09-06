@@ -210,7 +210,9 @@ function openState(filename, canvas) {
 		cout("Could not open the saved emulation state.", 2);
 	}
 }
+
 function import_save(blobData) {
+	// Try to decode as the emulator multi-blob format first.
 	blobData = decodeBlob(blobData);
 	if (blobData && blobData.blobs) {
 		if (blobData.blobs.length > 0) {
@@ -218,6 +220,7 @@ function import_save(blobData) {
 				cout("Importing blob \"" + blobData.blobs[index].blobID + "\"", 0);
 				if (blobData.blobs[index].blobContent) {
 					if (blobData.blobs[index].blobID.substring(0, 5) == "SRAM_") {
+						// Store SRAM as base64 so older/newer code paths can read it.
 						setValue("B64_" + blobData.blobs[index].blobID, base64(blobData.blobs[index].blobContent));
 					}
 					else {
@@ -231,15 +234,49 @@ function import_save(blobData) {
 					cout("Blob chunk information missing completely.", 2);
 				}
 			}
+			return true;
 		}
 		else {
 			cout("Could not decode the imported file.", 2);
+			return false;
 		}
 	}
-	else {
-		cout("Could not decode the imported file.", 2);
+	// If decodeBlob failed, attempt to treat incoming data as a RAW SRAM (.sav) file.
+	try {
+		cout("Attempting to import as RAW SRAM data...", 0);
+		if (typeof blobData === 'string' && blobData.length > 0) {
+			// If an emulator instance is loaded, associate the imported SRAM with the current ROM name.
+			if (typeof GameBoyEmulatorInitialized === 'function' && GameBoyEmulatorInitialized()) {
+				try {
+					if (gameboy && gameboy.name && gameboy.name.length > 0) {
+						setValue("B64_SRAM_" + gameboy.name, base64(blobData));
+						cout("Imported RAW SRAM into current game's save slot: " + gameboy.name, 0);
+						refreshStorageListing();
+						return true;
+					}
+				}
+				catch (err) {
+					// Fall through to store unnamed
+				}
+			}
+			// If we don't have a running emulator or couldn't determine the ROM name,
+			// store the imported SRAM under an auto-generated key so the user can
+			// find it in the storage listing later.
+			var ts = (new Date()).getTime();
+			var genKey = "B64_SRAM_imported_" + ts;
+			setValue(genKey, base64(blobData));
+			cout("Imported RAW SRAM saved to storage key: " + genKey, 1);
+			refreshStorageListing();
+			return true;
+		}
 	}
+	catch (error) {
+		cout("Failed to import RAW SRAM data: " + error.message, 2);
+	}
+	cout("Could not decode the imported file.", 2);
+	return false;
 }
+
 function generateBlob(keyName, encodedData) {
 	//Append the file format prefix:
 	var saveString = "EMULATOR_DATA";
