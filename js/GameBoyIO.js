@@ -210,199 +210,36 @@ function openState(filename, canvas) {
 		cout("Could not open the saved emulation state.", 2);
 	}
 }
-
 function import_save(blobData) {
-	// Debug helper: print the incoming type (will show in the page console via cout).
-	try { cout("import_save called, input type: " + (typeof blobData) + " (Blob? " + (typeof Blob !== "undefined" && blobData instanceof Blob) + ", ArrayBuffer? " + (blobData instanceof ArrayBuffer) + ", Uint8Array? " + (typeof Uint8Array !== "undefined" && blobData instanceof Uint8Array) + ")", 1); } catch (e) {}
-
-	// Helper: convert ArrayBuffer -> binary string (chunked to avoid apply() limits)
-	function abToBinaryString(buffer) {
-		var u8 = new Uint8Array(buffer);
-		var CHUNK = 0x8000;
-		var c = [];
-		for (var i = 0; i < u8.length; i += CHUNK) {
-			c.push(String.fromCharCode.apply(null, u8.subarray(i, i + CHUNK)));
-		}
-		return c.join('');
-	}
-	// Helper: convert ArrayBuffer -> base64
-	function arrayBufferToBase64(buffer) {
-		try {
-			var binary = abToBinaryString(buffer);
-			return btoa(binary);
-		} catch (e) {
-			cout("arrayBufferToBase64 failed: " + (e && e.message ? e.message : e), 2);
-			return null;
-		}
-	}
-	// Helper: store imported base64 into local storage with key logic
-	function storeImportedB64(b64) {
-		if (!b64) {
-			cout("No base64 data to store.", 2);
-			return false;
-		}
-		try {
-			var key = null;
-			if (typeof GameBoyEmulatorInitialized === 'function' && GameBoyEmulatorInitialized()) {
-				try {
-					if (gameboy && gameboy.name && gameboy.name.length > 0) {
-						key = "B64_SRAM_" + gameboy.name;
-					}
-				} catch (e) {
-					// ignore and fallback
-				}
-			}
-			if (!key) key = "B64_SRAM_imported_" + (new Date()).getTime();
-			setValue(key, b64);
-			cout("Imported RAW saved to storage key: " + key, 0);
-			refreshStorageListing();
-			return true;
-		} catch (err) {
-			cout("Could not store imported RAW: " + (err && err.message ? err.message : err), 2);
-			return false;
-		}
-	}
-
-	// Try to interpret the incoming data as multi-blob first.
-	// For that we need a binary *string* (decodeBlob expects string with char codes==bytes).
-	function tryProcessBinaryString(binStr, arrayBufIfAny) {
-		try {
-			var decoded = null;
-			try {
-				decoded = decodeBlob(binStr);
-			} catch (e) {
-				decoded = null;
-			}
-			if (decoded && decoded.blobs && decoded.blobs.length > 0) {
-				// Behave like original multi-blob import
-				for (var index = 0; index < decoded.blobs.length; ++index) {
-					cout("Importing blob \"" + decoded.blobs[index].blobID + "\"", 0);
-					if (decoded.blobs[index].blobContent) {
-						try {
-							if (decoded.blobs[index].blobID.substring(0, 5) == "SRAM_") {
-								// store SRAM as base64 so older/newer code paths can read it
-								// blobContent is binary string -> use btoa
-								try {
-									setValue("B64_" + decoded.blobs[index].blobID, btoa(decoded.blobs[index].blobContent));
-								} catch (e) {
-									// fallback: try to convert via arrayBuffer if provided (rare)
-									if (arrayBufIfAny) {
-										var b64 = arrayBufferToBase64(arrayBufIfAny);
-										if (b64) setValue("B64_" + decoded.blobs[index].blobID, b64);
-									} else {
-										setValue("B64_" + decoded.blobs[index].blobID, decoded.blobs[index].blobContent);
-									}
-								}
-							}
-							else {
-								// try JSON parse, else store raw
-								try {
-									setValue(decoded.blobs[index].blobID, JSON.parse(decoded.blobs[index].blobContent));
-								} catch (e) {
-									setValue(decoded.blobs[index].blobID, decoded.blobs[index].blobContent);
-								}
-							}
-						} catch (e) {
-							cout("Error importing blob \"" + decoded.blobs[index].blobID + "\": " + (e && e.message ? e.message : e), 2);
-						}
-					}
-					else if (decoded.blobs[index].blobID) {
-						cout("Save file imported had blob \"" + decoded.blobs[index].blobID + "\" with no blob data interpretable.", 2);
+	blobData = decodeBlob(blobData);
+	if (blobData && blobData.blobs) {
+		if (blobData.blobs.length > 0) {
+			for (var index = 0; index < blobData.blobs.length; ++index) {
+				cout("Importing blob \"" + blobData.blobs[index].blobID + "\"", 0);
+				if (blobData.blobs[index].blobContent) {
+					if (blobData.blobs[index].blobID.substring(0, 5) == "SRAM_") {
+						setValue("B64_" + blobData.blobs[index].blobID, base64(blobData.blobs[index].blobContent));
 					}
 					else {
-						cout("Blob chunk information missing completely.", 2);
+						setValue(blobData.blobs[index].blobID, JSON.parse(blobData.blobs[index].blobContent));
 					}
 				}
-				refreshStorageListing();
-				return true;
-			}
-		} catch (e) {
-			cout("decodeBlob attempt threw: " + (e && e.message ? e.message : e), 1);
-		}
-
-		// Not a multi-blob file -> treat as RAW SRAM (.sav)
-		try {
-			// If we have an ArrayBuffer available, use it to produce base64 (safe)
-			if (arrayBufIfAny) {
-				var b64 = arrayBufferToBase64(arrayBufIfAny);
-				if (!b64) {
-					// fallback: try btoa on binStr
-					try {
-						b64 = btoa(binStr);
-					} catch (e) {
-						// try low-8-bit conversion
-						var binary = "";
-						for (var i = 0; i < binStr.length; i++) binary += String.fromCharCode(binStr.charCodeAt(i) & 0xFF);
-						b64 = btoa(binary);
-					}
+				else if (blobData.blobs[index].blobID) {
+					cout("Save file imported had blob \"" + blobData.blobs[index].blobID + "\" with no blob data interpretable.", 2);
 				}
-				return storeImportedB64(b64);
-			} else {
-				// No ArrayBuffer: try btoa on binary string, with fallback
-				try {
-					var b64 = btoa(binStr);
-					return storeImportedB64(b64);
-				} catch (e) {
-					var binary = "";
-					for (var i = 0; i < binStr.length; i++) binary += String.fromCharCode(binStr.charCodeAt(i) & 0xFF);
-					var b64b = btoa(binary);
-					return storeImportedB64(b64b);
+				else {
+					cout("Blob chunk information missing completely.", 2);
 				}
 			}
-		} catch (err) {
-			cout("Failed importing RAW SRAM: " + (err && err.message ? err.message : err), 2);
-			return false;
+		}
+		else {
+			cout("Could not decode the imported file.", 2);
 		}
 	}
-
-	// If input is a File / Blob -> read as ArrayBuffer asynchronously
-	if (typeof Blob !== "undefined" && blobData instanceof Blob) {
-		try {
-			var reader = new FileReader();
-			reader.onload = function (e) {
-				try {
-					var ab = e.target.result;
-					var bin = abToBinaryString(ab);
-					tryProcessBinaryString(bin, ab);
-				} catch (er) {
-					cout("Error processing imported file: " + (er && er.message ? er.message : er), 2);
-				}
-			};
-			reader.onerror = function (ev) {
-				cout("FileReader error while importing RAW SRAM.", 2);
-			};
-			reader.readAsArrayBuffer(blobData);
-			// Asynchronous read started; return true to indicate processing in progress
-			return true;
-		} catch (e) {
-			cout("Failed to read Blob for import: " + (e && e.message ? e.message : e), 2);
-			return false;
-		}
+	else {
+		cout("Could not decode the imported file.", 2);
 	}
-	// If input is ArrayBuffer
-	else if (blobData instanceof ArrayBuffer) {
-		var bin = abToBinaryString(blobData);
-		return tryProcessBinaryString(bin, blobData);
-	}
-	// If input is Uint8Array
-	else if (typeof Uint8Array !== "undefined" && blobData instanceof Uint8Array) {
-		// Create a copy ArrayBuffer slice for the exact bytes
-		var arrBuf = blobData.buffer;
-		if (blobData.byteOffset !== 0 || blobData.byteLength !== arrBuf.byteLength) {
-			arrBuf = arrBuf.slice(blobData.byteOffset, blobData.byteOffset + blobData.byteLength);
-		}
-		var bin2 = abToBinaryString(arrBuf);
-		return tryProcessBinaryString(bin2, arrBuf);
-	}
-	// If input is a string (binary or already text)
-	else if (typeof blobData === 'string' && blobData.length > 0) {
-		return tryProcessBinaryString(blobData, null);
-	}
-	// Unknown / unsupported type
-	cout("Could not decode the imported file (unsupported input type: " + (typeof blobData) + ").", 2);
-	return false;
 }
-
 function generateBlob(keyName, encodedData) {
 	//Append the file format prefix:
 	var saveString = "EMULATOR_DATA";
