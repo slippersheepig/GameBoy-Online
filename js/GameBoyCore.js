@@ -9531,19 +9531,3 @@ GameBoyCore.prototype.getTypedArray = function (length, defaultValue, numberType
 	}
 	return arrayHandle;
 }
-GameBoyCore.prototype.loadSRAMState = function (sramArray) {
-	if (!this.cSRAM || this.MBCRam.length == 0) {
-		cout("This cartridge does not support SRAM, cannot load.", 1);
-		return false;
-	}
-	if (!sramArray || sramArray.length == 0) {
-		cout("Provided SRAM data is empty.", 1);
-		return false;
-	}
-	cout("Injecting SRAM data into the core.", 0);
-	var newMBCRam = this.toTypedArray(sramArray, "uint8");
-	for (var i = 0; i < this.MBCRam.length && i < newMBCRam.length; ++i) {
-		this.MBCRam[i] = newMBCRam[i];
-	}
-	return true;
-}
