@@ -450,7 +450,6 @@ ul.menu > li:hover > ul.menu {
   box-sizing: border-box;
   pointer-events: auto;
   max-width: 520px;
-  background: transparent;
 }
 
 .gb-controls-inner {
