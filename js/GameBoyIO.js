@@ -210,34 +210,60 @@ function openState(filename, canvas) {
 		cout("Could not open the saved emulation state.", 2);
 	}
 }
-function import_save(blobData) {
-	blobData = decodeBlob(blobData);
-	if (blobData && blobData.blobs) {
-		if (blobData.blobs.length > 0) {
+function import_save(fileData) {
+	if (!GameBoyEmulatorInitialized()) {
+        cout("Cannot import save when no game is running.", 1);
+        return;
+    }
+	if (fileData.substring(0, 13) == "EMULATOR_DATA") {
+		cout("Emulator's own save format detected.", 0);
+		var blobData = decodeBlob(fileData);
+		if (blobData && blobData.blobs) {
 			for (var index = 0; index < blobData.blobs.length; ++index) {
-				cout("Importing blob \"" + blobData.blobs[index].blobID + "\"", 0);
-				if (blobData.blobs[index].blobContent) {
-					if (blobData.blobs[index].blobID.substring(0, 5) == "SRAM_") {
-						setValue("B64_" + blobData.blobs[index].blobID, base64(blobData.blobs[index].blobContent));
+				var blobID = blobData.blobs[index].blobID;
+				var blobContent = blobData.blobs[index].blobContent;
+				cout("Importing blob \"" + blobID + "\"", 0);
+				if (blobContent) {
+					if (blobID.substring(0, 5) == "SRAM_") {
+						var sramArray = [];
+						for (var i = 0; i < blobContent.length; i++) {
+							sramArray.push(blobContent.charCodeAt(i) & 0xFF);
+						}
+						if (GameBoyEmulatorPlaying()) {
+							gameboy.loadSRAMState(sramArray);
+							cout("SRAM loaded. You may need to reset the game to see changes.", 0);
+						}
+						setValue("B64_" + blobID, base64(blobContent));
 					}
 					else {
-						setValue(blobData.blobs[index].blobID, JSON.parse(blobData.blobs[index].blobContent));
+						setValue(blobID, JSON.parse(blobContent));
 					}
-				}
-				else if (blobData.blobs[index].blobID) {
-					cout("Save file imported had blob \"" + blobData.blobs[index].blobID + "\" with no blob data interpretable.", 2);
-				}
-				else {
-					cout("Blob chunk information missing completely.", 2);
 				}
 			}
 		}
-		else {
-			cout("Could not decode the imported file.", 2);
-		}
 	}
 	else {
-		cout("Could not decode the imported file.", 2);
+		cout("RAW save format detected.", 0);
+		try {
+			var sramArray = [];
+			for (var i = 0; i < fileData.length; i++) {
+				sramArray.push(fileData.charCodeAt(i) & 0xFF);
+			}
+			if (GameBoyEmulatorPlaying()) {
+				if (gameboy.loadSRAMState(sramArray)) {
+					cout("RAW SRAM successfully loaded. You may need to reset the game for changes to take effect.", 0);
+				}
+			}
+			var base64SRAM = arrayToBase64(sramArray);
+			if (base64SRAM) {
+				var storageKey = "B64_SRAM_" + gameboy.name;
+				setValue(storageKey, base64SRAM);
+				cout("RAW SRAM saved to browser storage.", 0);
+			}
+		}
+		catch (error) {
+			cout("Could not import the RAW save file: " + error.message, 2);
+		}
 	}
 }
 function generateBlob(keyName, encodedData) {
@@ -286,6 +312,19 @@ function generateMultiBlob(blobPairs) {
 	//Now add the prefix:
 	saveString = "EMULATOR_DATA" + to_little_endian_dword(totalLength) + saveString;
 	return saveString;
+}
+function arrayToBase64(array) {
+    var string = '';
+    var length = array.length;
+    for (var i = 0; i < length; i++) {
+        string += String.fromCharCode(array[i]);
+    }
+    try {
+        return window.btoa(string);
+    } catch (e) {
+        cout("Failed to Base64 encode array: " + e.message, 2);
+        return null;
+    }
 }
 function decodeBlob(blobData) {
 	/*Format is as follows:
