@@ -212,67 +212,131 @@ function openState(filename, canvas) {
 }
 
 function import_save(blobData) {
-	// Try to decode as the emulator multi-blob format first.
-	blobData = decodeBlob(blobData);
-	if (blobData && blobData.blobs) {
-		if (blobData.blobs.length > 0) {
-			for (var index = 0; index < blobData.blobs.length; ++index) {
-				cout("Importing blob \"" + blobData.blobs[index].blobID + "\"", 0);
-				if (blobData.blobs[index].blobContent) {
-					if (blobData.blobs[index].blobID.substring(0, 5) == "SRAM_") {
-						// Store SRAM as base64 so older/newer code paths can read it.
-						setValue("B64_" + blobData.blobs[index].blobID, base64(blobData.blobs[index].blobContent));
+	// 尝试按原有的 multi-blob 格式解析；若解析成功则按原逻辑导入并返回 true。
+	try {
+		var decoded = decodeBlob(blobData);
+		if (decoded && decoded.blobs && decoded.blobs.length > 0) {
+			for (var index = 0; index < decoded.blobs.length; ++index) {
+				cout("Importing blob \"" + decoded.blobs[index].blobID + "\"", 0);
+				if (decoded.blobs[index].blobContent) {
+					// SRAM 内容在原代码里用 base64(...) 保存为 B64_SRAM_*，这里保持兼容。
+					if (decoded.blobs[index].blobID.substring(0, 5) == "SRAM_") {
+						setValue("B64_" + decoded.blobs[index].blobID, base64(decoded.blobs[index].blobContent));
 					}
 					else {
-						setValue(blobData.blobs[index].blobID, JSON.parse(blobData.blobs[index].blobContent));
+						// 其他项保存为解析后的 JSON（与原逻辑一致）
+						try {
+							setValue(decoded.blobs[index].blobID, JSON.parse(decoded.blobs[index].blobContent));
+						} catch (e) {
+							// 如果不能 parse，直接保存原始文本
+							setValue(decoded.blobs[index].blobID, decoded.blobs[index].blobContent);
+						}
 					}
 				}
-				else if (blobData.blobs[index].blobID) {
-					cout("Save file imported had blob \"" + blobData.blobs[index].blobID + "\" with no blob data interpretable.", 2);
+				else if (decoded.blobs[index].blobID) {
+					cout("Save file imported had blob \"" + decoded.blobs[index].blobID + "\" with no blob data interpretable.", 2);
 				}
 				else {
 					cout("Blob chunk information missing completely.", 2);
 				}
 			}
-			return true;
-		}
-		else {
-			cout("Could not decode the imported file.", 2);
-			return false;
-		}
-	}
-	// If decodeBlob failed, attempt to treat incoming data as a RAW SRAM (.sav) file.
-	try {
-		cout("Attempting to import as RAW SRAM data...", 0);
-		if (typeof blobData === 'string' && blobData.length > 0) {
-			// If an emulator instance is loaded, associate the imported SRAM with the current ROM name.
-			if (typeof GameBoyEmulatorInitialized === 'function' && GameBoyEmulatorInitialized()) {
-				try {
-					if (gameboy && gameboy.name && gameboy.name.length > 0) {
-						setValue("B64_SRAM_" + gameboy.name, base64(blobData));
-						cout("Imported RAW SRAM into current game's save slot: " + gameboy.name, 0);
-						refreshStorageListing();
-						return true;
-					}
-				}
-				catch (err) {
-					// Fall through to store unnamed
-				}
-			}
-			// If we don't have a running emulator or couldn't determine the ROM name,
-			// store the imported SRAM under an auto-generated key so the user can
-			// find it in the storage listing later.
-			var ts = (new Date()).getTime();
-			var genKey = "B64_SRAM_imported_" + ts;
-			setValue(genKey, base64(blobData));
-			cout("Imported RAW SRAM saved to storage key: " + genKey, 1);
 			refreshStorageListing();
 			return true;
 		}
+	} catch (e) {
+		// decodeBlob 抛错则继续尝试 RAW 导入
+		cout("decodeBlob failed (will attempt RAW import): " + (e && e.message ? e.message : ""), 1);
 	}
-	catch (error) {
-		cout("Failed to import RAW SRAM data: " + error.message, 2);
+
+	// 到这里：decodeBlob 未能成功解析成有效的 blobs => 作为 RAW SRAM (.sav) 处理。
+	// blobData 可能是：
+	//  - File / Blob 对象（浏览器 file input）
+	//  - 已经是 binary 字符串（从旧接口传入）
+	//  - base64 / 其它（不常见）
+	// 我们尝试兼容 File/Blob 与 string。
+
+	function arrayBufferToBase64(buffer) {
+		var bytes = new Uint8Array(buffer);
+		var binary = "";
+		var len = bytes.byteLength;
+		// 按 byte-by-byte 拼接二进制字符串（注意性能：sav 文件通常不太大，适用）
+		for (var i = 0; i < len; i++) {
+			binary += String.fromCharCode(bytes[i]);
+		}
+		// 浏览器提供的 btoa 可将 binary string 转为 base64
+		return btoa(binary);
 	}
+
+	function storeImportedB64(b64) {
+		try {
+			var key = null;
+			if (typeof GameBoyEmulatorInitialized === 'function' && GameBoyEmulatorInitialized()) {
+				try {
+					if (gameboy && gameboy.name && gameboy.name.length > 0) {
+						key = "B64_SRAM_" + gameboy.name;
+					}
+				} catch (e) {
+					// ignore and fallback to auto key
+				}
+			}
+			if (!key) {
+				key = "B64_SRAM_imported_" + (new Date()).getTime();
+			}
+			setValue(key, b64);
+			cout("Imported RAW SRAM saved to storage key: " + key, 0);
+			refreshStorageListing();
+			return true;
+		} catch (err) {
+			cout("Could not store RAW save: " + (err && err.message ? err.message : err), 2);
+			return false;
+		}
+	}
+
+	// 如果传入的是 Blob / File，异步读取 ArrayBuffer 后再存
+	if (typeof Blob !== "undefined" && blobData instanceof Blob) {
+		try {
+			var reader = new FileReader();
+			reader.onload = function (e) {
+				try {
+					var b64 = arrayBufferToBase64(e.target.result);
+					storeImportedB64(b64);
+				} catch (err2) {
+					cout("Failed converting imported RAW Blob to base64: " + (err2 && err2.message ? err2.message : err2), 2);
+				}
+			};
+			reader.onerror = function (ev) {
+				cout("FileReader error while importing RAW SRAM.", 2);
+			};
+			reader.readAsArrayBuffer(blobData);
+			// 由于异步读取，返回 true 表示已接收并在处理
+			return true;
+		} catch (err) {
+			cout("Failed to read blob for RAW import: " + (err && err.message ? err.message : err), 2);
+			return false;
+		}
+	}
+	// 如果是字符串（可能是二进制字符串），直接 base64 编码并存
+	else if (typeof blobData === 'string' && blobData.length > 0) {
+		try {
+			// 尝试直接用 btoa（如果字符串中包含非 Latin1 字符，btoa 可能抛错）
+			var b64str;
+			try {
+				b64str = btoa(blobData);
+			} catch (e) {
+				// 如果 btoa 失败，尝试先把每个字符按 charCode 截断为低 8 位再编码
+				var binary = "";
+				for (var i = 0; i < blobData.length; i++) {
+					binary += String.fromCharCode(blobData.charCodeAt(i) & 0xFF);
+				}
+				b64str = btoa(binary);
+			}
+			return storeImportedB64(b64str);
+		} catch (err) {
+			cout("Failed to import RAW string data: " + (err && err.message ? err.message : err), 2);
+			return false;
+		}
+	}
+	// 其他情况：无法识别的输入
 	cout("Could not decode the imported file.", 2);
 	return false;
 }
