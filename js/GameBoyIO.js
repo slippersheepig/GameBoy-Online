@@ -212,62 +212,35 @@ function openState(filename, canvas) {
 }
 
 function import_save(blobData) {
-	// 尝试按原有的 multi-blob 格式解析；若解析成功则按原逻辑导入并返回 true。
-	try {
-		var decoded = decodeBlob(blobData);
-		if (decoded && decoded.blobs && decoded.blobs.length > 0) {
-			for (var index = 0; index < decoded.blobs.length; ++index) {
-				cout("Importing blob \"" + decoded.blobs[index].blobID + "\"", 0);
-				if (decoded.blobs[index].blobContent) {
-					// SRAM 内容在原代码里用 base64(...) 保存为 B64_SRAM_*，这里保持兼容。
-					if (decoded.blobs[index].blobID.substring(0, 5) == "SRAM_") {
-						setValue("B64_" + decoded.blobs[index].blobID, base64(decoded.blobs[index].blobContent));
-					}
-					else {
-						// 其他项保存为解析后的 JSON（与原逻辑一致）
-						try {
-							setValue(decoded.blobs[index].blobID, JSON.parse(decoded.blobs[index].blobContent));
-						} catch (e) {
-							// 如果不能 parse，直接保存原始文本
-							setValue(decoded.blobs[index].blobID, decoded.blobs[index].blobContent);
-						}
-					}
-				}
-				else if (decoded.blobs[index].blobID) {
-					cout("Save file imported had blob \"" + decoded.blobs[index].blobID + "\" with no blob data interpretable.", 2);
-				}
-				else {
-					cout("Blob chunk information missing completely.", 2);
-				}
-			}
-			refreshStorageListing();
-			return true;
+	// Debug helper: print the incoming type (will show in the page console via cout).
+	try { cout("import_save called, input type: " + (typeof blobData) + " (Blob? " + (typeof Blob !== "undefined" && blobData instanceof Blob) + ", ArrayBuffer? " + (blobData instanceof ArrayBuffer) + ", Uint8Array? " + (typeof Uint8Array !== "undefined" && blobData instanceof Uint8Array) + ")", 1); } catch (e) {}
+
+	// Helper: convert ArrayBuffer -> binary string (chunked to avoid apply() limits)
+	function abToBinaryString(buffer) {
+		var u8 = new Uint8Array(buffer);
+		var CHUNK = 0x8000;
+		var c = [];
+		for (var i = 0; i < u8.length; i += CHUNK) {
+			c.push(String.fromCharCode.apply(null, u8.subarray(i, i + CHUNK)));
 		}
-	} catch (e) {
-		// decodeBlob 抛错则继续尝试 RAW 导入
-		cout("decodeBlob failed (will attempt RAW import): " + (e && e.message ? e.message : ""), 1);
+		return c.join('');
 	}
-
-	// 到这里：decodeBlob 未能成功解析成有效的 blobs => 作为 RAW SRAM (.sav) 处理。
-	// blobData 可能是：
-	//  - File / Blob 对象（浏览器 file input）
-	//  - 已经是 binary 字符串（从旧接口传入）
-	//  - base64 / 其它（不常见）
-	// 我们尝试兼容 File/Blob 与 string。
-
+	// Helper: convert ArrayBuffer -> base64
 	function arrayBufferToBase64(buffer) {
-		var bytes = new Uint8Array(buffer);
-		var binary = "";
-		var len = bytes.byteLength;
-		// 按 byte-by-byte 拼接二进制字符串（注意性能：sav 文件通常不太大，适用）
-		for (var i = 0; i < len; i++) {
-			binary += String.fromCharCode(bytes[i]);
+		try {
+			var binary = abToBinaryString(buffer);
+			return btoa(binary);
+		} catch (e) {
+			cout("arrayBufferToBase64 failed: " + (e && e.message ? e.message : e), 2);
+			return null;
 		}
-		// 浏览器提供的 btoa 可将 binary string 转为 base64
-		return btoa(binary);
 	}
-
+	// Helper: store imported base64 into local storage with key logic
 	function storeImportedB64(b64) {
+		if (!b64) {
+			cout("No base64 data to store.", 2);
+			return false;
+		}
 		try {
 			var key = null;
 			if (typeof GameBoyEmulatorInitialized === 'function' && GameBoyEmulatorInitialized()) {
@@ -276,68 +249,157 @@ function import_save(blobData) {
 						key = "B64_SRAM_" + gameboy.name;
 					}
 				} catch (e) {
-					// ignore and fallback to auto key
+					// ignore and fallback
 				}
 			}
-			if (!key) {
-				key = "B64_SRAM_imported_" + (new Date()).getTime();
-			}
+			if (!key) key = "B64_SRAM_imported_" + (new Date()).getTime();
 			setValue(key, b64);
-			cout("Imported RAW SRAM saved to storage key: " + key, 0);
+			cout("Imported RAW saved to storage key: " + key, 0);
 			refreshStorageListing();
 			return true;
 		} catch (err) {
-			cout("Could not store RAW save: " + (err && err.message ? err.message : err), 2);
+			cout("Could not store imported RAW: " + (err && err.message ? err.message : err), 2);
 			return false;
 		}
 	}
 
-	// 如果传入的是 Blob / File，异步读取 ArrayBuffer 后再存
+	// Try to interpret the incoming data as multi-blob first.
+	// For that we need a binary *string* (decodeBlob expects string with char codes==bytes).
+	function tryProcessBinaryString(binStr, arrayBufIfAny) {
+		try {
+			var decoded = null;
+			try {
+				decoded = decodeBlob(binStr);
+			} catch (e) {
+				decoded = null;
+			}
+			if (decoded && decoded.blobs && decoded.blobs.length > 0) {
+				// Behave like original multi-blob import
+				for (var index = 0; index < decoded.blobs.length; ++index) {
+					cout("Importing blob \"" + decoded.blobs[index].blobID + "\"", 0);
+					if (decoded.blobs[index].blobContent) {
+						try {
+							if (decoded.blobs[index].blobID.substring(0, 5) == "SRAM_") {
+								// store SRAM as base64 so older/newer code paths can read it
+								// blobContent is binary string -> use btoa
+								try {
+									setValue("B64_" + decoded.blobs[index].blobID, btoa(decoded.blobs[index].blobContent));
+								} catch (e) {
+									// fallback: try to convert via arrayBuffer if provided (rare)
+									if (arrayBufIfAny) {
+										var b64 = arrayBufferToBase64(arrayBufIfAny);
+										if (b64) setValue("B64_" + decoded.blobs[index].blobID, b64);
+									} else {
+										setValue("B64_" + decoded.blobs[index].blobID, decoded.blobs[index].blobContent);
+									}
+								}
+							}
+							else {
+								// try JSON parse, else store raw
+								try {
+									setValue(decoded.blobs[index].blobID, JSON.parse(decoded.blobs[index].blobContent));
+								} catch (e) {
+									setValue(decoded.blobs[index].blobID, decoded.blobs[index].blobContent);
+								}
+							}
+						} catch (e) {
+							cout("Error importing blob \"" + decoded.blobs[index].blobID + "\": " + (e && e.message ? e.message : e), 2);
+						}
+					}
+					else if (decoded.blobs[index].blobID) {
+						cout("Save file imported had blob \"" + decoded.blobs[index].blobID + "\" with no blob data interpretable.", 2);
+					}
+					else {
+						cout("Blob chunk information missing completely.", 2);
+					}
+				}
+				refreshStorageListing();
+				return true;
+			}
+		} catch (e) {
+			cout("decodeBlob attempt threw: " + (e && e.message ? e.message : e), 1);
+		}
+
+		// Not a multi-blob file -> treat as RAW SRAM (.sav)
+		try {
+			// If we have an ArrayBuffer available, use it to produce base64 (safe)
+			if (arrayBufIfAny) {
+				var b64 = arrayBufferToBase64(arrayBufIfAny);
+				if (!b64) {
+					// fallback: try btoa on binStr
+					try {
+						b64 = btoa(binStr);
+					} catch (e) {
+						// try low-8-bit conversion
+						var binary = "";
+						for (var i = 0; i < binStr.length; i++) binary += String.fromCharCode(binStr.charCodeAt(i) & 0xFF);
+						b64 = btoa(binary);
+					}
+				}
+				return storeImportedB64(b64);
+			} else {
+				// No ArrayBuffer: try btoa on binary string, with fallback
+				try {
+					var b64 = btoa(binStr);
+					return storeImportedB64(b64);
+				} catch (e) {
+					var binary = "";
+					for (var i = 0; i < binStr.length; i++) binary += String.fromCharCode(binStr.charCodeAt(i) & 0xFF);
+					var b64b = btoa(binary);
+					return storeImportedB64(b64b);
+				}
+			}
+		} catch (err) {
+			cout("Failed importing RAW SRAM: " + (err && err.message ? err.message : err), 2);
+			return false;
+		}
+	}
+
+	// If input is a File / Blob -> read as ArrayBuffer asynchronously
 	if (typeof Blob !== "undefined" && blobData instanceof Blob) {
 		try {
 			var reader = new FileReader();
 			reader.onload = function (e) {
 				try {
-					var b64 = arrayBufferToBase64(e.target.result);
-					storeImportedB64(b64);
-				} catch (err2) {
-					cout("Failed converting imported RAW Blob to base64: " + (err2 && err2.message ? err2.message : err2), 2);
+					var ab = e.target.result;
+					var bin = abToBinaryString(ab);
+					tryProcessBinaryString(bin, ab);
+				} catch (er) {
+					cout("Error processing imported file: " + (er && er.message ? er.message : er), 2);
 				}
 			};
 			reader.onerror = function (ev) {
 				cout("FileReader error while importing RAW SRAM.", 2);
 			};
 			reader.readAsArrayBuffer(blobData);
-			// 由于异步读取，返回 true 表示已接收并在处理
+			// Asynchronous read started; return true to indicate processing in progress
 			return true;
-		} catch (err) {
-			cout("Failed to read blob for RAW import: " + (err && err.message ? err.message : err), 2);
+		} catch (e) {
+			cout("Failed to read Blob for import: " + (e && e.message ? e.message : e), 2);
 			return false;
 		}
 	}
-	// 如果是字符串（可能是二进制字符串），直接 base64 编码并存
+	// If input is ArrayBuffer
+	else if (blobData instanceof ArrayBuffer) {
+		var bin = abToBinaryString(blobData);
+		return tryProcessBinaryString(bin, blobData);
+	}
+	// If input is Uint8Array
+	else if (typeof Uint8Array !== "undefined" && blobData instanceof Uint8Array) {
+		// Create a copy ArrayBuffer slice for the exact bytes
+		var arrBuf = blobData.buffer;
+		if (blobData.byteOffset !== 0 || blobData.byteLength !== arrBuf.byteLength) {
+			arrBuf = arrBuf.slice(blobData.byteOffset, blobData.byteOffset + blobData.byteLength);
+		}
+		var bin2 = abToBinaryString(arrBuf);
+		return tryProcessBinaryString(bin2, arrBuf);
+	}
+	// If input is a string (binary or already text)
 	else if (typeof blobData === 'string' && blobData.length > 0) {
-		try {
-			// 尝试直接用 btoa（如果字符串中包含非 Latin1 字符，btoa 可能抛错）
-			var b64str;
-			try {
-				b64str = btoa(blobData);
-			} catch (e) {
-				// 如果 btoa 失败，尝试先把每个字符按 charCode 截断为低 8 位再编码
-				var binary = "";
-				for (var i = 0; i < blobData.length; i++) {
-					binary += String.fromCharCode(blobData.charCodeAt(i) & 0xFF);
-				}
-				b64str = btoa(binary);
-			}
-			return storeImportedB64(b64str);
-		} catch (err) {
-			cout("Failed to import RAW string data: " + (err && err.message ? err.message : err), 2);
-			return false;
-		}
+		return tryProcessBinaryString(blobData, null);
 	}
-	// 其他情况：无法识别的输入
-	cout("Could not decode the imported file.", 2);
+	// Unknown / unsupported type
+	cout("Could not decode the imported file (unsupported input type: " + (typeof blobData) + ").", 2);
 	return false;
 }
 
