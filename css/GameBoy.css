@@ -450,14 +450,15 @@ ul.menu > li:hover > ul.menu {
   box-sizing: border-box;
   pointer-events: auto;
   max-width: 520px;
+  background: transparent;
 }
 
 .gb-controls-inner {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8px;
-  padding: 8px;
+  gap: 12px;
+  padding: 10px;
   background: linear-gradient(180deg, #0b6623 0%, #064e12 100%);
   border-radius: 12px;
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.22);
@@ -466,28 +467,17 @@ ul.menu > li:hover > ul.menu {
   color: #ffffff;
 }
 
-.gb-btn {
-  -webkit-user-select: none;
-  user-select: none;
-  border: none;
-  outline: none;
-  cursor: pointer;
-  background: #000;
-  color: #fff;
-  padding: 6px;
-  box-shadow: 0 6px 0 rgba(0, 0, 0, 0.18);
-  border-radius: 10px;
-  font-weight: 700;
-  display: inline-flex;
+.gb-controls-row {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
   align-items: center;
-  justify-content: center;
+  justify-content: space-between;
+  gap: 20px;
   box-sizing: border-box;
-}
-
-.gb-btn:active {
-  transform: translateY(3px);
-  box-shadow: 0 3px 0 rgba(0, 0, 0, 0.12);
-  background: #111;
+  flex-wrap: nowrap;
+  padding: 0;
+  margin: 0;
 }
 
 .gb-dpad {
@@ -555,37 +545,41 @@ ul.menu > li:hover > ul.menu {
 
 .gb-ab {
   position: relative;
-  width: 120px;
-  height: 120px;
+  width: 200px;
+  height: 200px;
   box-sizing: border-box;
   flex: 0 0 auto;
   display: block;
   padding: 0;
   margin: 0;
 }
+
 .gb-ab .gb-btn {
   position: absolute;
   margin: 0;
 }
+
 .gb-btn.gb-b {
-  left: 10px;
-  bottom: 10px;
+  left: 16px;
+  bottom: 16px;
   width: 64px;
   height: 64px;
   border-radius: 50%;
   border: 2px solid #333;
   background: #000;
   color: #fff;
+  box-shadow: 0 6px 0 rgba(0,0,0,0.18);
 }
 .gb-btn.gb-a {
-  right: 10px;
-  top: 10px;
+  right: 16px;
+  top: 16px;
   width: 64px;
   height: 64px;
   border-radius: 50%;
   border: 2px solid #333;
   background: #000;
   color: #fff;
+  box-shadow: 0 6px 0 rgba(0,0,0,0.18);
 }
 
 .gb-select-start {
@@ -597,65 +591,82 @@ ul.menu > li:hover > ul.menu {
   padding: 6px 6px 4px 6px;
   box-sizing: border-box;
 }
-.gb-btn.gb-select,
-.gb-btn.gb-start {
+.gb-btn.gb-select, .gb-btn.gb-start {
   min-width: 72px;
   height: 40px;
   border-radius: 8px;
   font-size: 13px;
   padding: 6px 12px;
-  box-shadow: 0 6px 0 rgba(0, 0, 0, 0.18);
+  box-shadow: 0 6px 0 rgba(0,0,0,0.18);
   background: #000;
   color: #fff;
   border: 2px solid #333;
 }
 
+.gb-btn {
+  -webkit-user-select: none;
+  user-select: none;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  background: #000;
+  color: #fff;
+  padding: 6px;
+  box-shadow: 0 6px 0 rgba(0, 0, 0, 0.18);
+  border-radius: 10px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+}
+.gb-btn:active {
+  transform: translateY(3px);
+  box-shadow: 0 3px 0 rgba(0, 0, 0, 0.12);
+  background: #111;
+}
+
 @media (max-width: 420px) {
+  .gb-controls-row { gap: 12px; }
   .gb-dpad {
     width: 120px;
     height: 120px;
     gap: 6px;
     min-width: 96px;
   }
-  .gb-dpad-up,
-  .gb-dpad-down {
+  .gb-dpad-up, .gb-dpad-down {
     width: 48px;
     height: 36px;
   }
-  .gb-dpad-left,
-  .gb-dpad-right {
+  .gb-dpad-left, .gb-dpad-right {
     width: 36px;
     height: 48px;
   }
-  .gb-btn.gb-a,
-  .gb-btn.gb-b {
-    width: 56px;
-    height: 56px;
-    font-size: 16px;
-  }
   .gb-ab {
-    width: 96px;
-    height: 96px;
+    width: 140px;
+    height: 140px;
   }
   .gb-btn.gb-b {
-    left: 8px;
-    bottom: 8px;
+    left: 10px;
+    bottom: 10px;
     width: 56px;
     height: 56px;
   }
   .gb-btn.gb-a {
-    right: 8px;
-    top: 8px;
+    right: 10px;
+    top: 10px;
     width: 56px;
     height: 56px;
   }
-  .gb-btn.gb-select,
-  .gb-btn.gb-start {
+  .gb-btn.gb-a, .gb-btn.gb-b {
+    font-size: 16px;
+  }
+  .gb-btn.gb-select, .gb-btn.gb-start {
     min-width: 60px;
     height: 36px;
   }
   .gb-controls-inner {
-    padding: 6px;
+    padding: 8px;
     gap: 8px;
   }
 }
