@@ -35,11 +35,9 @@ html, body {
   border-top-right-radius: 5px;
   border-bottom-left-radius: 5px;
   border-bottom-right-radius: 30px;
-
   --screen-h-pad: 12%;
   --screen-top-pad: 16%;
   --screen-bottom-pad: 22%;
-
   overflow: visible;
 }
 
