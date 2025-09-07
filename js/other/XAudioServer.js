@@ -183,50 +183,243 @@ XAudioServer.prototype.initializeMozAudio = function () {
     this.initializeResampler(XAudioJSMozAudioSampleRate);
 }
 XAudioServer.prototype.initializeWebAudio = function () {
-	if (!XAudioJSWebAudioLaunchedContext) {
+    // Create or reuse AudioContext:
+    if (!XAudioJSWebAudioLaunchedContext) {
         try {
-            XAudioJSWebAudioContextHandle = new AudioContext();								//Create a system audio context.
+            XAudioJSWebAudioContextHandle = new AudioContext(); // modern
         }
         catch (error) {
-            XAudioJSWebAudioContextHandle = new webkitAudioContext();							//Create a system audio context.
+            try {
+                XAudioJSWebAudioContextHandle = new webkitAudioContext(); // older webkit
+            } catch (e) {
+                // If even webkitAudioContext not available, throw and let outer try/catch pick fallback
+                throw error;
+            }
         }
         XAudioJSWebAudioLaunchedContext = true;
     }
+
+    // If an old node existed, disconnect it:
     if (XAudioJSWebAudioAudioNode) {
-        XAudioJSWebAudioAudioNode.disconnect();
-        XAudioJSWebAudioAudioNode.onaudioprocess = null;
+        try {
+            XAudioJSWebAudioAudioNode.disconnect();
+        } catch (e) {}
+        try { XAudioJSWebAudioAudioNode.onaudioprocess = null; } catch (e) {}
         XAudioJSWebAudioAudioNode = null;
     }
-    try {
-        XAudioJSWebAudioAudioNode = XAudioJSWebAudioContextHandle.createScriptProcessor(XAudioJSSamplesPerCallback, 0, XAudioJSChannelsAllocated);	//Create the js event node.
-    }
-    catch (error) {
-        XAudioJSWebAudioAudioNode = XAudioJSWebAudioContextHandle.createJavaScriptNode(XAudioJSSamplesPerCallback, 0, XAudioJSChannelsAllocated);	//Create the js event node.
-    }
-    XAudioJSWebAudioAudioNode.onaudioprocess = XAudioJSWebAudioEvent;																			//Connect the audio processing event to a handling function so we can manipulate output
-    XAudioJSWebAudioAudioNode.connect(XAudioJSWebAudioContextHandle.destination);																//Send and chain the output of the audio manipulation to the system audio output.
+
+    // Make sure we have the latest sample rate & buffers
     this.resetCallbackAPIAudioBuffer(XAudioJSWebAudioContextHandle.sampleRate);
     this.audioType = 1;
-    /*
-     Firefox has a bug in its web audio implementation...
-     The node may randomly stop playing on Mac OS X for no
-     good reason. Keep a watchdog timer to restart the failed
-     node if it glitches. Google Chrome never had this issue.
-     */
-    XAudioJSWebAudioWatchDogLast = (new Date()).getTime();
-    if (navigator.userAgent.indexOf('Gecko/') > -1) {
-        if (XAudioJSWebAudioWatchDogTimer) {
-            clearInterval(XAudioJSWebAudioWatchDogTimer);
+
+    // Small helper: resume audio context on first user interaction (fix mobile auto-suspend)
+    (function resumeOnInteraction(ctx) {
+        if (!ctx) return;
+        if (ctx.state === 'suspended' || ctx.state === 'interrupted') {
+            var resume = function () {
+                ctx.resume && ctx.resume().catch(function(){});
+                document.removeEventListener('touchstart', resume, true);
+                document.removeEventListener('mousedown', resume, true);
+                document.removeEventListener('click', resume, true);
+            };
+            // use passive where safe
+            document.addEventListener('touchstart', resume, true);
+            document.addEventListener('mousedown', resume, true);
+            document.addEventListener('click', resume, true);
         }
-        var parentObj = this;
-        XAudioJSWebAudioWatchDogTimer = setInterval(function () {
-            var timeDiff = (new Date()).getTime() - XAudioJSWebAudioWatchDogLast;
-            if (timeDiff > 500) {
-                parentObj.initializeWebAudio();
-            }
-        }, 500);
+    })(XAudioJSWebAudioContextHandle);
+
+    // If AudioWorklet is available, use it (preferred; removes ScriptProcessor deprecation warning).
+    var parentObj = this;
+    if (XAudioJSWebAudioContextHandle.audioWorklet && typeof AudioWorkletNode !== 'undefined') {
+        try {
+            // Build a small worklet script as a blob so we don't need an external file.
+            var workletScript = [
+                'class XAudioProcessor extends AudioWorkletProcessor {',
+                '  constructor(options) {',
+                '    super();',
+                '    var procOpts = options.processorOptions || {};',
+                '    this.channels = procOpts.channels || 1;',
+                '    this._buffer = new Float32Array(0);',
+                '    this._readIndex = 0;',
+                '    this._tickCounter = 0;',
+                '    var self = this;',
+                '    this.port.onmessage = function(e) {',
+                '      var d = e.data;',
+                '      if (!d) return;',
+                '      if (d.cmd === "pushBuffer" && d.buffer) {',
+                '        // append received buffer (transferred ArrayBuffer)',
+                '        var arr = new Float32Array(d.buffer);',
+                '        var newBuf = new Float32Array(self._buffer.length - self._readIndex + arr.length);',
+                '        if (self._buffer.length - self._readIndex > 0) {',
+                '          newBuf.set(self._buffer.subarray(self._readIndex), 0);',
+                '        }',
+                '        newBuf.set(arr, self._buffer.length - self._readIndex);',
+                '        self._buffer = newBuf;',
+                '        self._readIndex = 0;',
+                '      } else if (d.cmd === "clear") {',
+                '        self._buffer = new Float32Array(0);',
+                '        self._readIndex = 0;',
+                '      }',
+                '    };',
+                '  }',
+                '  process(inputs, outputs) {',
+                '    var out = outputs[0];',
+                '    var frames = (out[0] && out[0].length) ? out[0].length : 128;',
+                '    var channels = this.channels;',
+                '    var needed = frames * channels;',
+                '    // If we have enough buffered samples, copy them out channel-wise',
+                '    if (this._buffer.length - this._readIndex >= needed) {',
+                '      var base = this._readIndex;',
+                '      for (var ch = 0; ch < channels; ++ch) {',
+                '        var chOut = out[ch];',
+                '        var idx = base + ch;',
+                '        for (var i = 0; i < frames; ++i) {',
+                '          chOut[i] = this._buffer[idx];',
+                '          idx += channels;',
+                '        }',
+                '      }',
+                '      this._readIndex += needed;',
+                '      // trim if we've consumed many samples',
+                '      if (this._readIndex > 16384) {',
+                '        this._buffer = this._buffer.subarray(this._readIndex);',
+                '        this._readIndex = 0;',
+                '      }',
+                '    } else {',
+                '      // underrun -> fill zeros',
+                '      for (var ch2 = 0; ch2 < channels; ++ch2) {',
+                '        var chOut2 = out[ch2];',
+                '        for (var j = 0; j < frames; ++j) chOut2[j] = 0;',
+                '      }',
+                '      // Ask main thread for more samples (main thread will reply with pushBuffer)',
+                '      this.port.postMessage({ cmd: "needSamples", frames: frames });',
+                '    }',
+                '    // send a tick occasionally so the main thread can detect the node is alive',
+                '    this._tickCounter = (this._tickCounter + 1) | 0;',
+                '    if ((this._tickCounter & 3) === 0) {',
+                '      this.port.postMessage({ cmd: "tick" });',
+                '    }',
+                '    return true;',
+                '  }',
+                '}',
+                'registerProcessor("xaudio-processor", XAudioProcessor);'
+            ].join('\n');
+
+            var blob = new Blob([workletScript], { type: 'application/javascript' });
+            var blobURL = URL.createObjectURL(blob);
+
+            // Add module and create node when ready
+            XAudioJSWebAudioContextHandle.audioWorklet.addModule(blobURL).then(function () {
+                // create the worklet node
+                XAudioJSWebAudioAudioNode = new AudioWorkletNode(XAudioJSWebAudioContextHandle, 'xaudio-processor', {
+                    numberOfOutputs: 1,
+                    outputChannelCount: [XAudioJSChannelsAllocated],
+                    processorOptions: { channels: XAudioJSChannelsAllocated }
+                });
+
+                // Handle messages from the processor:
+                XAudioJSWebAudioAudioNode.port.onmessage = function (e) {
+                    var data = e.data;
+                    if (!data) return;
+                    if (data.cmd === 'needSamples') {
+                        // Processor asks for frames; respond by filling an interleaved Float32Array
+                        var framesRequested = data.frames || XAudioJSSamplesPerCallback;
+                        var totalReq = framesRequested * XAudioJSChannelsAllocated;
+                        var sendBuf = new Float32Array(totalReq);
+                        var fillIndex = 0;
+
+                        // Ensure resampled buffer is refilled from main queued samples:
+                        XAudioJSResampleRefill();
+
+                        // Copy from XAudioJSResampledBuffer into sendBuf same as old onaudioprocess logic:
+                        for (var idx = 0; idx < framesRequested && XAudioJSResampleBufferStart != XAudioJSResampleBufferEnd; ++idx) {
+                            for (var ch = 0; ch < XAudioJSChannelsAllocated; ++ch) {
+                                sendBuf[fillIndex++] = XAudioJSResampledBuffer[XAudioJSResampleBufferStart++] * XAudioJSVolume;
+                                if (XAudioJSResampleBufferStart == XAudioJSResampleBufferSize) {
+                                    XAudioJSResampleBufferStart = 0;
+                                }
+                            }
+                        }
+                        // pad with zeros if undersupplied
+                        while (fillIndex < sendBuf.length) sendBuf[fillIndex++] = 0;
+
+                        // Transfer the buffer to the worklet
+                        try {
+                            XAudioJSWebAudioAudioNode.port.postMessage({ cmd: 'pushBuffer', buffer: sendBuf.buffer }, [sendBuf.buffer]);
+                        } catch (err) {
+                            // fallback: post without transfer (slower)
+                            XAudioJSWebAudioAudioNode.port.postMessage({ cmd: 'pushBuffer', buffer: sendBuf.buffer });
+                        }
+                    } else if (data.cmd === 'tick') {
+                        // worklet signals it's alive -> update watchdog timestamp
+                        XAudioJSWebAudioWatchDogLast = (new Date()).getTime();
+                    }
+                };
+
+                // connect to destination
+                XAudioJSWebAudioAudioNode.connect(XAudioJSWebAudioContextHandle.destination);
+
+                // start watchdog timestamp for Gecko compatibility (original behavior)
+                XAudioJSWebAudioWatchDogLast = (new Date()).getTime();
+
+                // If Gecko, ensure the watchdog timer restarts the node on glitch (same as original)
+                if (navigator.userAgent.indexOf('Gecko/') > -1) {
+                    if (XAudioJSWebAudioWatchDogTimer) {
+                        clearInterval(XAudioJSWebAudioWatchDogTimer);
+                    }
+                    var parentObj2 = parentObj;
+                    XAudioJSWebAudioWatchDogTimer = setInterval(function () {
+                        var timeDiff = (new Date()).getTime() - XAudioJSWebAudioWatchDogLast;
+                        if (timeDiff > 500) {
+                            try {
+                                parentObj2.initializeWebAudio();
+                            } catch (err) {}
+                        }
+                    }, 500);
+                }
+            }).catch(function (err) {
+                // If worklet failed for any reason, fallback to old ScriptProcessor creation
+                createDeprecatedProcessor();
+            });
+
+            // done (return from try)
+            return;
+        } catch (err) {
+            // fall through to deprecated processor creation
+        }
     }
-}
+
+    // If audioWorklet not available or failed, create the old ScriptProcessor (keeps original behavior)
+    function createDeprecatedProcessor() {
+        try {
+            // preferred modern (but deprecated) API
+            XAudioJSWebAudioAudioNode = XAudioJSWebAudioContextHandle.createScriptProcessor(XAudioJSSamplesPerCallback, 0, XAudioJSChannelsAllocated);
+        } catch (error) {
+            // older webkit name
+            XAudioJSWebAudioAudioNode = XAudioJSWebAudioContextHandle.createJavaScriptNode(XAudioJSSamplesPerCallback, 0, XAudioJSChannelsAllocated);
+        }
+        // set the old onaudioprocess handler (unchanged)
+        XAudioJSWebAudioAudioNode.onaudioprocess = XAudioJSWebAudioEvent;
+        XAudioJSWebAudioAudioNode.connect(XAudioJSWebAudioContextHandle.destination);
+        XAudioJSWebAudioWatchDogLast = (new Date()).getTime();
+
+        if (navigator.userAgent.indexOf('Gecko/') > -1) {
+            if (XAudioJSWebAudioWatchDogTimer) {
+                clearInterval(XAudioJSWebAudioWatchDogTimer);
+            }
+            var parentObj3 = parentObj;
+            XAudioJSWebAudioWatchDogTimer = setInterval(function () {
+                var timeDiff = (new Date()).getTime() - XAudioJSWebAudioWatchDogLast;
+                if (timeDiff > 500) {
+                    parentObj3.initializeWebAudio();
+                }
+            }, 500);
+        }
+    }
+
+    // create deprecated processor immediately if worklet path not used:
+    createDeprecatedProcessor();
+};
 XAudioServer.prototype.initializeFlashAudio = function () {
 	var existingFlashload = document.getElementById("XAudioJS");
 	this.flashInitialized = false;
