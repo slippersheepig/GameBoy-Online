@@ -549,17 +549,17 @@ function popupStorageDialog(keyName) {
 		downloadDiv2.id = "storagePopupDownloadRAW";
 		downloadDiv2.appendChild(outputLocalStorageLink("以RAW格式下载存档。", findValue(keyName), keyName));
 		subContainer.appendChild(downloadDiv2);
-		downloadDiv.appendChild(outputLocalStorageLink("以导入兼容格式下载存档。", base64(generateBlob(keyName.substring(4), base64_decode(findValue(keyName)))), keyName));
+		downloadDiv.appendChild(outputLocalStorageLink("以模拟器格式下载存档。", base64(generateBlob(keyName.substring(4), base64_decode(findValue(keyName)))), keyName));
 	}
 	else if (keyName.substring(0, 5) == "SRAM_") {
 		var downloadDiv2 = document.createElement("div");
 		downloadDiv2.id = "storagePopupDownloadRAW";
 		downloadDiv2.appendChild(outputLocalStorageLink("以RAW格式下载存档。", base64(convertToBinary(findValue(keyName))), keyName));
 		subContainer.appendChild(downloadDiv2);
-		downloadDiv.appendChild(outputLocalStorageLink("以导入兼容格式下载存档。", base64(generateBlob(keyName, convertToBinary(findValue(keyName)))), keyName));
+		downloadDiv.appendChild(outputLocalStorageLink("以模拟器格式下载存档。", base64(generateBlob(keyName, convertToBinary(findValue(keyName)))), keyName));
 	}
 	else {
-		downloadDiv.appendChild(outputLocalStorageLink("以导入兼容格式下载存档。", base64(generateBlob(keyName, JSON.stringify(findValue(keyName)))), keyName));
+		downloadDiv.appendChild(outputLocalStorageLink("以模拟器格式下载存档。", base64(generateBlob(keyName, JSON.stringify(findValue(keyName)))), keyName));
 	}
 	var deleteLink = generateLink("javascript:deleteStorageSlot(\"" + keyName + "\")", "从HTML5本地存储中删除数据。");
 	deleteLink.id = "storagePopupDelete";
