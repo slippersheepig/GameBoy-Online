@@ -240,13 +240,61 @@ function registerGUIEvents() {
 					cout("Reading the local file \"" + this.files[0].name + "\" for importing.", 0);
 					try {
 						//Gecko 1.9.2+ (Standard Method)
-						var binaryHandle = new FileReader();
-						binaryHandle.onload = function () {
+						var file_for_import = this.files[this.files.length - 1];
+                        var binaryHandle = new FileReader();
+                        binaryHandle.onload = function () {
 							if (this.readyState == 2) {
 								cout("file imported.", 0);
 								try {
-									import_save(this.result);
-									refreshStorageListing();
+									var fileData = this.result;
+									// If imported file uses the emulator's multi-blob format (starts with "EMULATOR_DATA"),
+									// use existing import_save to handle it:
+									if (typeof fileData === "string" && fileData.substring(0, 13) === "EMULATOR_DATA") {
+										import_save(fileData);
+										refreshStorageListing();
+									}
+									else {
+										// Treat as RAW binary save (e.g. .sav). We'll store it as B64_SRAM_<ROM name>.
+										// Capture the original filename from the input element via closure (fileObj).
+										var fileObj = file_for_import;
+										var targetName = null;
+										try {
+											if (typeof gameboy == "object" && gameboy && gameboy.name) {
+												targetName = gameboy.name;
+											}
+										}
+										catch (e) { targetName = null; }
+										if (!targetName) {
+											// Fallback to filename without extension
+											try {
+												targetName = fileObj.name.replace(/\.[^.]+$/, '');
+											}
+											catch (e) {
+												targetName = "unknown";
+											}
+										}
+										// Convert binary string to base64 using existing base64() helper
+										var b64 = base64(fileData);
+										// Store into localStorage under the same key the emulator expects:
+										setValue("B64_SRAM_" + targetName, b64);
+										cout("Imported RAW save into localStorage as B64_SRAM_" + targetName, 0);
+										refreshStorageListing();
+										// If a game with the same name is currently running, attempt to apply RAM immediately.
+										try {
+											if (typeof gameboy == "object" && gameboy && gameboy.name && gameboy.name == targetName) {
+												var rawArr = base64ToArray(b64);
+												var mbcSize = (gameboy.numRAMBanks ? gameboy.numRAMBanks * 0x2000 : rawArr.length);
+												var typed = gameboy.getTypedArray(mbcSize, 0, "uint8");
+												var len = Math.min(rawArr.length, typed.length);
+												for (var i = 0; i < len; i++) typed[i] = rawArr[i];
+												gameboy.MBCRam = typed;
+												cout("Applied RAW SRAM to running emulator (MBCRam updated).", 0);
+											}
+										}
+										catch (e) {
+											cout("Could not apply RAW SRAM to running emulator: " + e.message, 2);
+										}
+									}
 								}
 								catch (error) {
 									alert(error.message + " file: " + error.fileName + " line: " + error.lineNumber);
@@ -256,7 +304,7 @@ function registerGUIEvents() {
 								cout("importing file, please wait...", 0);
 							}
 						}
-						binaryHandle.readAsBinaryString(this.files[this.files.length - 1]);
+                        binaryHandle.readAsBinaryString(this.files[this.files.length - 1]);
 					}
 					catch (error) {
 						cout("Browser does not support the FileReader object, falling back to the non-standard File object access,", 2);
