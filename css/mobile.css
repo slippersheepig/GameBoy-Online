@@ -33,16 +33,17 @@ html, body {
   border-top-left-radius: 5px;
   border-top-right-radius: 5px;
   border-bottom-left-radius: 5px;
-  border-bottom-right-radius: 30px;
+  border-bottom-right-radius: 5px;
   position: relative;
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
 }
 
 #power {
   position: absolute;
-  left: 15px;
+  left: calc(50% - 90px);
   top: 50%;
   transform: translateY(-50%);
   font-size: 8pt;
@@ -82,10 +83,6 @@ html, body {
 }
 
 #screen_cover > div:last-child {
-  position: absolute;
-  bottom: 10px;
-  left: 0;
-  right: 0;
   text-align: center;
   color: white;
   font-style: oblique;
