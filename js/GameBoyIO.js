@@ -136,18 +136,19 @@ function autoSave() {
   if (GameBoyEmulatorInitialized()) {
     cout("Automatically saving the SRAM.", 0);
     saveSRAM();
-    saveRTC();
   }
 }
 function openSRAM(filename) {
   try {
-    if (findValue("B64_SRAM_" + filename) != null) {
+    var b64SRAM = findValue("B64_SRAM_" + filename);
+    if (b64SRAM != null) {
       cout("Found a previous SRAM state (Will attempt to load).", 0);
-      return base64ToArray(findValue("B64_SRAM_" + filename));
+      return base64ToArray(b64SRAM);
     }
-    else if (findValue("SRAM_" + filename) != null) {
+    var legacySRAM = findValue("SRAM_" + filename);
+    if (legacySRAM != null) {
       cout("Found a previous SRAM state (Will attempt to load).", 0);
-      return findValue("SRAM_" + filename);
+      return legacySRAM;
     }
     else {
       cout("Could not find any previous SRAM copy for the current ROM.", 0);
@@ -160,9 +161,10 @@ function openSRAM(filename) {
 }
 function openRTC(filename) {
   try {
-    if (findValue("RTC_" + filename) != null) {
+    var rtcState = findValue("RTC_" + filename);
+    if (rtcState != null) {
       cout("Found a previous RTC state (Will attempt to load).", 0);
-      return findValue("RTC_" + filename);
+      return rtcState;
     }
     else {
       cout("Could not find any previous RTC copy for the current ROM.", 0);
