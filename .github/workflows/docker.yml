@@ -5,7 +5,7 @@ on:
   repository_dispatch:
     types: [nginx_update]
   pull_request:
-    branches: ["main"]
+    branches: ["master"]
 
 env:
   IMAGE_NAME: gameboy
