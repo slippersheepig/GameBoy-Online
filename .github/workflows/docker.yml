@@ -4,6 +4,8 @@ on:
   workflow_dispatch:
   repository_dispatch:
     types: [nginx_update]
+  pull_request:
+    branches: ["main"]
 
 env:
   IMAGE_NAME: gameboy
