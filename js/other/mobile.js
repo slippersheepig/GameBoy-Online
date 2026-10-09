@@ -58,7 +58,9 @@ function shim (eles) {
       if (!keyZone) return;
     }
     GameBoyKeyDown(keyZone);
-    navigator.vibrate(50);
+    if (typeof navigator.vibrate === "function") {
+      navigator.vibrate(50);
+    }
   };
   function onUp (e) {
     var keyZone = e.target.dataset.keyZone;
@@ -67,7 +69,9 @@ function shim (eles) {
       if (!keyZone) return;
     }
     GameBoyKeyUp(keyZone);
-    navigator.vibrate(0);
+    if (typeof navigator.vibrate === "function") {
+      navigator.vibrate(0);
+    }
   };
   eles.forEach(function (ele) {
     ele.ontouchstart = ele.onmousedown = onDown;
