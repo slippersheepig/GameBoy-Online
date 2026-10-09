@@ -16,7 +16,7 @@ var settings = [            //Some settings.
   false,                //Use the GameBoy boot ROM instead of the GameBoy Color boot ROM.
   false,                //Scale the canvas in JS, or let the browser scale the canvas?
   true,                //Use image smoothing based scaling?
-    [true, true, true, true]            //User controlled channel enables.
+  [true, true, true, true]            //User controlled channel enables.
 ];
 function start(canvas, ROM) {
   clearLastEmulation();
@@ -155,7 +155,7 @@ function openSRAM(filename) {
     }
   }
   catch (error) {
-    cout("Could not open the  SRAM of the saved emulation state.", 2);
+    cout("Could not open the SRAM of the saved emulation state.", 2);
   }
   return [];
 }
@@ -205,7 +205,7 @@ function openState(filename, canvas) {
       }
     }
     else {
-      cout("Could not find the save state " + filename + "\".", 2);
+      cout("Could not find the save state \"" + filename + "\".", 2);
     }
   }
   catch (error) {
@@ -309,7 +309,7 @@ function decodeBlob(blobData) {
   blobProperties.blobs = [];
   if (length > 17) {
     if (blobData.substring(0, 13) == "EMULATOR_DATA") {
-      var length = Math.min(((blobData.charCodeAt(16) & 0xFF) << 24) | ((blobData.charCodeAt(15) & 0xFF) << 16) | ((blobData.charCodeAt(14) & 0xFF) << 8) | (blobData.charCodeAt(13) & 0xFF), length);
+      length = Math.min(((blobData.charCodeAt(16) & 0xFF) << 24) | ((blobData.charCodeAt(15) & 0xFF) << 16) | ((blobData.charCodeAt(14) & 0xFF) << 8) | (blobData.charCodeAt(13) & 0xFF), length);
       var consoleIDLength = blobData.charCodeAt(17) & 0xFF;
       if (length > 17 + consoleIDLength) {
         blobProperties.consoleID = blobData.substring(18, 18 + consoleIDLength);
