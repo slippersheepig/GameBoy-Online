@@ -1,8 +1,6 @@
 /* On-screen controls: map touch / mouse events to GameBoyKeyDown / GameBoyKeyUp */
 (function () {
   "use strict";
-  function safeCall(fn) { try { if (typeof fn === "function") fn(); } catch(e) { console && console.error && console.error(e); } }
-
   function pressKey(key) {
     if (typeof GameBoyKeyDown === "function") {
       try { GameBoyKeyDown(key); } catch(e) { console.error(e); }
@@ -16,8 +14,17 @@
 
   function bindButton(el, key) {
     if (!el) return;
-    var start = function (e) { e.preventDefault(); pressKey(key); };
-    var end = function (e) { e.preventDefault(); releaseKey(key); };
+    var lastInteraction = 0;
+    var start = function (e) {
+      e.preventDefault();
+      lastInteraction = Date.now();
+      pressKey(key);
+    };
+    var end = function (e) {
+      e.preventDefault();
+      lastInteraction = Date.now();
+      releaseKey(key);
+    };
     el.addEventListener("touchstart", start, {passive:false});
     el.addEventListener("touchend", end);
     el.addEventListener("touchcancel", end);
@@ -25,7 +32,12 @@
     el.addEventListener("mouseup", end);
     el.addEventListener("mouseleave", end);
     // Accessibility: space/enter key on the button will also trigger press/release via click
-    el.addEventListener("click", function(e){ e.preventDefault(); /* toggle quick tap */ pressKey(key); setTimeout(function(){ releaseKey(key); }, 120); });
+    el.addEventListener("click", function(e){
+      e.preventDefault();
+      if (Date.now() - lastInteraction < 300) return;
+      pressKey(key);
+      setTimeout(function(){ releaseKey(key); }, 120);
+    });
   }
 
   function init() {
