@@ -3,17 +3,17 @@ var mainCanvas = null;
 var fullscreenCanvas = null;
 var showAsMinimal = false;
 
-// Key mappings for PC keyboard
-var keyZones = [
-  ["right", [39, 68]],       // ArrowRight, D
-  ["left", [37, 65]],        // ArrowLeft, A
-  ["up", [38, 87]],          // ArrowUp, W
-  ["down", [40, 83]],        // ArrowDown, S
-  ["a", [88, 75, 74]],       // X, K, J
-  ["b", [90, 81, 89]],       // Z, Q, Y
-  ["select", [16, 32, 8]],   // Shift, Space, Backspace
-  ["start", [13]]            // Enter
-];
+// Key mappings for PC keyboard supporting both keyCode, event.key and event.code
+var keyMap = {
+  "up": { codes: [38, 87], keys: ["ArrowUp", "w", "W", "Up"], codeNames: ["ArrowUp", "KeyW"] },
+  "down": { codes: [40, 83], keys: ["ArrowDown", "s", "S", "Down"], codeNames: ["ArrowDown", "KeyS"] },
+  "left": { codes: [37, 65], keys: ["ArrowLeft", "a", "A", "Left"], codeNames: ["ArrowLeft", "KeyA"] },
+  "right": { codes: [39, 68], keys: ["ArrowRight", "d", "D", "Right"], codeNames: ["ArrowRight", "KeyD"] },
+  "a": { codes: [88, 75, 74], keys: ["x", "X", "k", "K", "j", "J"], codeNames: ["KeyX", "KeyK", "KeyJ"] },
+  "b": { codes: [90, 81, 89], keys: ["z", "Z", "q", "Q", "y", "Y"], codeNames: ["KeyZ", "KeyQ", "KeyY"] },
+  "select": { codes: [16, 32, 8], keys: ["Shift", " ", "Backspace", "Spacebar"], codeNames: ["ShiftLeft", "ShiftRight", "Space", "Backspace"] },
+  "start": { codes: [13], keys: ["Enter"], codeNames: ["Enter", "NumpadEnter"] }
+};
 
 var cout = function (message, level) {
   if (typeof console !== "undefined" && console.log) {
@@ -62,10 +62,9 @@ function toggleAudio() {
         updateAudioBadge(true);
       });
     } else if (XAudioJSWebAudioContextHandle.state === "running") {
-      // Toggle volume
       if (typeof settings !== "undefined") {
         settings[0] = !settings[0];
-        if (gameboy) {
+        if (typeof gameboy === "object" && gameboy && typeof gameboy.changeVolume === "function") {
           gameboy.changeVolume();
         }
         updateAudioBadge(settings[0]);
@@ -162,7 +161,13 @@ var activePressedKeys = {};
 function pressKey(zone) {
   if (!activePressedKeys[zone]) {
     activePressedKeys[zone] = true;
-    GameBoyKeyDown(zone);
+    if (typeof GameBoyKeyDown === "function") {
+      try {
+        GameBoyKeyDown(zone);
+      } catch (e) {
+        cout(e.message, 2);
+      }
+    }
     setButtonActiveState(zone, true);
     resumeAudioContext();
     if (typeof navigator.vibrate === "function") {
@@ -174,7 +179,13 @@ function pressKey(zone) {
 function releaseKey(zone) {
   if (activePressedKeys[zone]) {
     activePressedKeys[zone] = false;
-    GameBoyKeyUp(zone);
+    if (typeof GameBoyKeyUp === "function") {
+      try {
+        GameBoyKeyUp(zone);
+      } catch (e) {
+        cout(e.message, 2);
+      }
+    }
     setButtonActiveState(zone, false);
     if (typeof navigator.vibrate === "function") {
       navigator.vibrate(0);
@@ -190,60 +201,69 @@ function releaseAllKeys() {
   }
 }
 
-function setupControlEvents() {
-  var targets = document.querySelectorAll("[data-key-zone]");
-  
-  function getZone(e) {
-    var el = e.target;
-    while (el && el !== document.body) {
-      if (el.dataset && el.dataset.keyZone) {
-        return el.dataset.keyZone;
-      }
-      el = el.parentNode;
+function bindControl(el, zone) {
+  if (!el) return;
+  var lastTouch = 0;
+
+  var onDown = function (e) {
+    if (e.cancelable && e.type !== "mousedown") {
+      e.preventDefault();
     }
-    return null;
+    lastTouch = Date.now();
+    pressKey(zone);
+  };
+
+  var onUp = function (e) {
+    if (e.cancelable && e.type !== "mouseup") {
+      e.preventDefault();
+    }
+    lastTouch = Date.now();
+    releaseKey(zone);
+  };
+
+  el.addEventListener("touchstart", onDown, { passive: false });
+  el.addEventListener("touchend", onUp, { passive: false });
+  el.addEventListener("touchcancel", onUp, { passive: false });
+  el.addEventListener("mousedown", onDown);
+  el.addEventListener("mouseup", onUp);
+  el.addEventListener("mouseleave", onUp);
+
+  // Fallback click
+  el.addEventListener("click", function (e) {
+    if (Date.now() - lastTouch < 300) return;
+    pressKey(zone);
+    setTimeout(function () {
+      releaseKey(zone);
+    }, 120);
+  });
+}
+
+function setupControlEvents() {
+  var mappings = {
+    "d_pad_up": "up",
+    "d_pad_down": "down",
+    "d_pad_left": "left",
+    "d_pad_right": "right",
+    "a_button_group": "a",
+    "b_button_group": "b",
+    "select_button_group": "select",
+    "start_button_group": "start"
+  };
+
+  for (var id in mappings) {
+    var el = document.getElementById(id);
+    if (el) {
+      bindControl(el, mappings[id]);
+    }
   }
 
-  targets.forEach(function (el) {
-    el.addEventListener("mousedown", function (e) {
-      var zone = getZone(e);
-      if (zone) {
-        pressKey(zone);
-        e.preventDefault();
-      }
-    });
-
-    el.addEventListener("touchstart", function (e) {
-      var zone = getZone(e);
-      if (zone) {
-        pressKey(zone);
-        e.preventDefault();
-      }
-    }, { passive: false });
-
-    el.addEventListener("touchend", function (e) {
-      var zone = getZone(e);
-      if (zone) {
-        releaseKey(zone);
-        e.preventDefault();
-      }
-    }, { passive: false });
-
-    el.addEventListener("touchcancel", function (e) {
-      var zone = getZone(e);
-      if (zone) {
-        releaseKey(zone);
-      }
-    });
-  });
-
+  // Global mouseup release
   window.addEventListener("mouseup", function () {
     releaseAllKeys();
   });
 
-  window.addEventListener("touchend", function () {
-    // If all touches end, release all
-    if (navigator.maxTouchPoints && event.touches && event.touches.length === 0) {
+  window.addEventListener("touchend", function (e) {
+    if (e && e.touches && e.touches.length === 0) {
       releaseAllKeys();
     }
   });
@@ -253,18 +273,24 @@ function setupControlEvents() {
   window.addEventListener("keyup", keyUp, false);
 }
 
-function keyDown(event) {
-  var keyCode = event.keyCode;
-  var matched = false;
-  for (var i = 0; i < keyZones.length; i++) {
-    var zoneName = keyZones[i][0];
-    var keys = keyZones[i][1];
-    if (keys.indexOf(keyCode) !== -1) {
-      pressKey(zoneName);
-      matched = true;
-    }
+function matchKeyZone(e) {
+  var k = e.key;
+  var code = e.code;
+  var kc = e.keyCode || e.which;
+
+  for (var zone in keyMap) {
+    var m = keyMap[zone];
+    if (kc && m.codes.indexOf(kc) !== -1) return zone;
+    if (k && m.keys.indexOf(k) !== -1) return zone;
+    if (code && m.codeNames.indexOf(code) !== -1) return zone;
   }
-  if (matched) {
+  return null;
+}
+
+function keyDown(event) {
+  var zone = matchKeyZone(event);
+  if (zone) {
+    pressKey(zone);
     try {
       event.preventDefault();
     } catch (e) {}
@@ -272,17 +298,9 @@ function keyDown(event) {
 }
 
 function keyUp(event) {
-  var keyCode = event.keyCode;
-  var matched = false;
-  for (var i = 0; i < keyZones.length; i++) {
-    var zoneName = keyZones[i][0];
-    var keys = keyZones[i][1];
-    if (keys.indexOf(keyCode) !== -1) {
-      releaseKey(zoneName);
-      matched = true;
-    }
-  }
-  if (matched) {
+  var zone = matchKeyZone(event);
+  if (zone) {
+    releaseKey(zone);
     try {
       event.preventDefault();
     } catch (e) {}
@@ -340,8 +358,11 @@ function setupRomLoader() {
   var overlay = document.getElementById("screen_overlay");
 
   if (loadBtn && romInput) {
-    loadBtn.addEventListener("click", function () {
-      romInput.click();
+    loadBtn.addEventListener("click", function (e) {
+      // If triggered by label, native click handles it; otherwise invoke:
+      if (e.target.tagName !== "LABEL") {
+        romInput.click();
+      }
     });
   }
   if (overlay && romInput) {
