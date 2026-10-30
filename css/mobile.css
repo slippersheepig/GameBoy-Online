@@ -3,237 +3,565 @@ body {
   margin: 0;
   padding: 0;
   width: 100%;
-  height: 100%;
-  background-color: black;
-  font-family: Verdana;
+  min-height: 100vh;
+  background: radial-gradient(circle at 50% 35%, #2a2e38 0%, #111317 100%);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-sizing: border-box;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+#gameboy_container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 8px;
+  box-sizing: border-box;
+  max-width: 100%;
 }
 
 #gameboy_shell {
-  height: 100%;
-  min-height: 480px;
-  min-width: 320px;
-  border-top-left-radius: 15px;
-  border-top-right-radius: 15px;
-  border-bottom-left-radius: 15px;
-  border-bottom-right-radius: 45px;
-  box-shadow: inset -15px 16px 6px -12px rgba(255, 255, 255, 0.5), inset 15px -11px 6px -11px rgba(0, 0, 0, 0.5);
-}
-
-#on_off {
-  margin-left: 10%;
-  font-size: 10pt;
-  text-shadow: 0px 0px 2px #000;
-}
-
-#screen_cover {
-  background-color: #525E59;
-  width: 80%;
-  height: 40%;
-  margin: 0 auto;
-  border: 1px solid black;
-  border-top-left-radius: 5px;
-  border-top-right-radius: 5px;
-  border-bottom-left-radius: 5px;
-  border-bottom-right-radius: 30px;
-}
-
-#power {
-  float: left;
   position: relative;
-  top: 30%;
-  font-size: 8pt;
-  color: white;
-  padding-left: 5px;
+  width: 360px;
+  height: 600px;
+  background-color: #33B678;
+  border-top-left-radius: 16px;
+  border-top-right-radius: 16px;
+  border-bottom-left-radius: 16px;
+  border-bottom-right-radius: 50px;
+  box-shadow: 
+    0 20px 45px rgba(0, 0, 0, 0.7),
+    inset -8px -8px 16px rgba(0, 0, 0, 0.25),
+    inset 8px 8px 16px rgba(255, 255, 255, 0.35);
+  box-sizing: border-box;
+  user-select: none;
+  -webkit-user-select: none;
+  overflow: hidden;
+  transition: transform 0.2s ease;
+}
+
+/* Off / On Switch text */
+#on_off {
+  position: absolute;
+  top: 9px;
+  left: 40px;
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  color: rgba(0, 0, 0, 0.5);
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.3);
+  text-transform: uppercase;
+  pointer-events: none;
+}
+
+#on_off::before {
+  content: "";
+  position: absolute;
+  top: -9px;
+  left: 18px;
+  width: 20px;
+  height: 4px;
+  background: #2b2e2d;
+  border-radius: 2px 2px 0 0;
+}
+
+/* Screen Cover Frame */
+#screen_cover {
+  position: relative;
+  width: 300px;
+  height: 250px;
+  margin: 26px auto 0 auto;
+  background-color: #525E59;
+  border: 2px solid #2d3430;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+  border-bottom-left-radius: 8px;
+  border-bottom-right-radius: 28px;
+  box-shadow: 
+    inset 2px 2px 6px rgba(0, 0, 0, 0.5),
+    inset -2px -2px 6px rgba(255, 255, 255, 0.1),
+    0 3px 6px rgba(0, 0, 0, 0.3);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  box-sizing: border-box;
+  padding-top: 12px;
+}
+
+/* Power Indicator */
+#power {
+  position: absolute;
+  left: 9px;
+  top: 72px;
+  width: 38px;
+  text-align: center;
+  font-size: 7px;
+  font-weight: bold;
+  letter-spacing: 0.5px;
+  color: #cbd5d0;
+  pointer-events: none;
 }
 
 .two_column {
-  width: 30px;
-  height: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  margin-bottom: 2px;
 }
 
 #power_light {
-  float: left;
-  position: static;
-  width: 10px;
-  height: 10px;
-  background-color: red;
-  margin-left: 5px;
-  margin-top: 2px;
-  border-radius: 10px;
+  width: 8px;
+  height: 8px;
+  background-color: #ff2222;
+  border-radius: 50%;
+  box-shadow: 0 0 7px #ff1111, inset 1px 1px 2px #ffffff;
 }
 
-#power_light+div {
-  float: right;
+.two_column > div:last-child {
+  font-size: 8px;
+  line-height: 8px;
+  color: #9aa4a0;
+  font-family: monospace;
 }
 
+/* Canvas Display */
 #canvas_container {
-  width: 160px;
-  margin: 20px;
+  position: relative;
+  width: 216px;
+  height: 194px;
+  margin: 0 auto;
+  background-color: #8b956d;
+  border: 2px solid #282f2c;
+  border-radius: 3px;
+  box-shadow: inset 2px 2px 6px rgba(0, 0, 0, 0.6);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-#screen_cover>div:last-child {
-  position: relative;
-  left: 15%;
-  width: 120px;
-  font-size: 10pt;
+#mainCanvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: -webkit-crisp-edges;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+
+#screen_overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.75);
+  color: #fff;
+  font-size: 13px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: opacity 0.2s;
   text-align: center;
-  color: white;
-  font-style: oblique;
+  padding: 10px;
+}
+
+#screen_overlay.hidden {
+  display: none;
+}
+
+/* Branding under screen */
+#brand_pocket,
+#screen_cover > div:last-child {
+  width: 100%;
+  text-align: center;
+  margin-top: 8px;
+  font-size: 11px;
+  font-style: italic;
+  font-weight: bold;
+  letter-spacing: 0.5px;
+  color: #cbd5d0;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.5);
+  pointer-events: none;
 }
 
 #pocket {
+  font-style: normal;
+  font-size: 8px;
+  font-weight: 800;
+  background-color: #cbd5d0;
   color: #525E59;
-  background-color: white;
-  font-size: 8pt;
+  padding: 1px 4px;
+  border-radius: 2px;
+  margin-left: 3px;
+  text-transform: uppercase;
 }
 
+/* Nintendo Logo */
 #nintendo {
-  border-radius: 10px;
-  width: 25%;
+  width: 82px;
+  margin: 11px auto 0 auto;
+  padding: 2px 6px;
   text-align: center;
-  margin: 10px auto 0 auto;
-  padding: 0 5px;
-  text-shadow: 0px 0px 2px #000;
-  box-shadow: 0px 0px 2px #000, inset 0px 0px 2px #000;
+  font-size: 10px;
+  font-weight: bold;
+  letter-spacing: 1.5px;
+  font-family: Pretendo, "Arial Black", Arial, sans-serif;
+  border: 2px solid;
+  border-radius: 12px;
+  opacity: 0.85;
+  box-shadow: inset 0 0 2px rgba(0, 0, 0, 0.4), 0 1px 1px rgba(255, 255, 255, 0.3);
+  pointer-events: none;
 }
 
+/* D-Pad Layout */
 #d_pad {
-  width: 70px;
-  height: 70px;
-  position: relative;
-  top: 20px;
-  left: 10%;
+  position: absolute;
+  left: 30px;
+  top: 334px;
+  width: 84px;
+  height: 84px;
+  touch-action: none;
 }
 
-#d_pad>div {
-  background-color: #525E59;
+#d_pad > div {
+  background-color: #2e3532;
 }
 
 #d_pad_up {
-  box-shadow: inset -15px 10px 10px -12px rgba(255, 255, 255, 0.5), inset 15px -11px 6px -11px rgba(0, 0, 0, 0.5);
-  border-top-left-radius: 5px;
-  border-top-right-radius: 5px;
-  width: 33%;
-  height: 33%;
+  width: 28px;
+  height: 28px;
   margin: 0 auto;
+  border-top-left-radius: 4px;
+  border-top-right-radius: 4px;
+  box-shadow: inset 1px 1px 1px rgba(255, 255, 255, 0.3), inset -1px 0 1px rgba(0, 0, 0, 0.5);
+  cursor: pointer;
+  position: relative;
 }
 
 #d_pad_left_right {
-  box-shadow: inset -15px 10px 10px -12px rgba(255, 255, 255, 0.5), inset 15px -11px 6px -11px rgba(0, 0, 0, 0.5);
-  border-radius: 5px;
-  height: 33%;
-  margin: 0 auto;
-}
-
-#d_pad_down {
-  box-shadow: inset -15px 10px 10px -12px rgba(255, 255, 255, 0.5), inset 15px -11px 6px -11px rgba(0, 0, 0, 0.5);
-  border-bottom-left-radius: 5px;
-  border-bottom-right-radius: 5px;
-  width: 33%;
-  height: 33%;
-  margin: 0 auto;
+  width: 84px;
+  height: 28px;
+  display: flex;
+  position: relative;
 }
 
 #d_pad_left {
-  width: 33%;
-  height: 100%;
-  float: left;
+  width: 28px;
+  height: 28px;
+  border-top-left-radius: 4px;
+  border-bottom-left-radius: 4px;
+  box-shadow: inset 1px 1px 1px rgba(255, 255, 255, 0.3), inset 0 -1px 1px rgba(0, 0, 0, 0.5);
+  cursor: pointer;
+  position: relative;
 }
 
 #d_pad_center {
-  border: 1px solid black;
-  height: 20px;
-  width: 20px;
-  margin: 0 auto;
-  border-radius: 20px;
-  /*box-shadow: inset 5px -5px 6px 0px rgba(255,255,255, 0.5);*/
-  box-shadow: inset -15px 10px 10px -12px rgba(0, 0, 0, 0.5), inset 15px -11px 6px -11px rgba(255, 255, 255, 0.5);
+  width: 28px;
+  height: 28px;
+  background-color: #2e3532;
+  position: relative;
+  pointer-events: none;
+}
+
+#d_pad_center::after {
+  content: "";
+  display: block;
+  width: 14px;
+  height: 14px;
+  margin: 7px auto;
+  border-radius: 50%;
+  background: #252b28;
+  box-shadow: inset 0 0 3px rgba(0, 0, 0, 0.7);
 }
 
 #d_pad_right {
-  width: 33%;
-  height: 100%;
-  float: right;
+  width: 28px;
+  height: 28px;
+  border-top-right-radius: 4px;
+  border-bottom-right-radius: 4px;
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.3), inset -1px -1px 1px rgba(0, 0, 0, 0.5);
+  cursor: pointer;
+  position: relative;
 }
 
-#arrow_up,
-#arrow_down,
-#arrow_left,
-#arrow_right {
+#d_pad_down {
+  width: 28px;
+  height: 28px;
+  margin: 0 auto;
+  border-bottom-left-radius: 4px;
+  border-bottom-right-radius: 4px;
+  box-shadow: inset 1px 0 1px rgba(255, 255, 255, 0.3), inset -1px -1px 1px rgba(0, 0, 0, 0.5);
+  cursor: pointer;
+  position: relative;
+}
+
+/* Arrow Shapes */
+#arrow_up {
+  position: absolute;
+  top: 6px;
+  left: 50%;
+  transform: translateX(-50%);
   width: 0;
   height: 0;
-  margin: 0 auto;
-}
-
-#arrow_up {
-  border-left: 10px solid transparent;
-  border-right: 10px solid transparent;
-  border-bottom: 20px solid black;
-}
-
-#arrow_left {
-  border-top: 10px solid transparent;
-  border-right: 20px solid black;
-  border-bottom: 10px solid transparent;
-}
-
-#arrow_right {
-  border-left: 20px solid black;
-  border-top: 10px solid transparent;
-  border-bottom: 10px solid transparent;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-bottom: 7px solid #1a1e1d;
+  pointer-events: none;
 }
 
 #arrow_down {
-  border-left: 10px solid transparent;
-  border-right: 10px solid transparent;
-  border-top: 20px solid black;
+  position: absolute;
+  bottom: 6px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 7px solid #1a1e1d;
+  pointer-events: none;
 }
 
-#a_button_group {
-  left: 75%;
-  top: 55%;
+#arrow_left {
+  position: absolute;
+  left: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 0;
+  height: 0;
+  border-top: 5px solid transparent;
+  border-bottom: 5px solid transparent;
+  border-right: 7px solid #1a1e1d;
+  pointer-events: none;
+}
+
+#arrow_right {
+  position: absolute;
+  right: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 0;
+  height: 0;
+  border-top: 5px solid transparent;
+  border-bottom: 5px solid transparent;
+  border-left: 7px solid #1a1e1d;
+  pointer-events: none;
+}
+
+/* D-Pad pressed effects */
+#d_pad_up:active, #d_pad_up.active { background-color: #202422; box-shadow: inset 1px 1px 2px rgba(0,0,0,0.8); }
+#d_pad_down:active, #d_pad_down.active { background-color: #202422; box-shadow: inset 1px 1px 2px rgba(0,0,0,0.8); }
+#d_pad_left:active, #d_pad_left.active { background-color: #202422; box-shadow: inset 1px 1px 2px rgba(0,0,0,0.8); }
+#d_pad_right:active, #d_pad_right.active { background-color: #202422; box-shadow: inset 1px 1px 2px rgba(0,0,0,0.8); }
+
+/* Action Buttons A & B */
+.button_group {
+  position: absolute;
+  width: 44px;
+  text-align: center;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+  font-weight: 800;
+  font-size: 11px;
+  color: rgba(0, 0, 0, 0.45);
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.round_button {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background-color: #2e3532;
+  margin: 0 auto 4px auto;
+  box-shadow: 
+    inset 1px 1px 2px rgba(255, 255, 255, 0.35),
+    inset -2px -2px 4px rgba(0, 0, 0, 0.6),
+    0 4px 6px rgba(0, 0, 0, 0.35);
+  transition: transform 0.05s, box-shadow 0.05s;
 }
 
 #b_button_group {
-  left: 55%;
-  top: 60%;
+  left: 230px;
+  top: 372px;
+}
+
+#a_button_group {
+  left: 286px;
+  top: 334px;
+}
+
+#a_button_group:active .round_button, #a_button_group.active .round_button,
+#b_button_group:active .round_button, #b_button_group.active .round_button {
+  transform: translateY(2px);
+  box-shadow: inset 1px 1px 4px rgba(0, 0, 0, 0.8), 0 1px 2px rgba(0, 0, 0, 0.3);
+  background-color: #242927;
+}
+
+/* Select & Start */
+.flat_button {
+  width: 40px;
+  height: 11px;
+  border-radius: 6px;
+  background-color: #525E59;
+  margin: 0 auto 6px auto;
+  transform: rotate(-25deg);
+  box-shadow: 
+    inset 1px 1px 1px rgba(255, 255, 255, 0.3),
+    inset -1px -1px 2px rgba(0, 0, 0, 0.6),
+    0 2px 4px rgba(0, 0, 0, 0.3);
+  transition: transform 0.05s, box-shadow 0.05s;
 }
 
 #select_button_group {
-  left: 33%;
-  top: 85%;
+  left: 110px;
+  top: 465px;
+  width: 52px;
 }
 
 #start_button_group {
-  right: 33%;
-  top: 85%;
+  left: 174px;
+  top: 465px;
+  width: 52px;
 }
 
-.button_group {
-  position: absolute;
-  text-align: center;
-  color: #525E59;
-  font-size: 10pt;
+#select_button_group span,
+#start_button_group span {
+  display: block;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  transform: rotate(-25deg);
 }
 
-.button_group div {
-  width: 40px;
-  background-color: #525E59;
-  border-radius: 20px;
-  margin: 0 auto 10px auto;
-  box-shadow: inset -15px 10px 10px -12px rgba(255, 255, 255, 0.5), inset 15px -11px 6px -11px rgba(0, 0, 0, 0.5);
+#select_button_group:active .flat_button, #select_button_group.active .flat_button,
+#start_button_group:active .flat_button, #start_button_group.active .flat_button {
+  transform: rotate(-25deg) translateY(1px);
+  box-shadow: inset 1px 1px 2px rgba(0, 0, 0, 0.8);
+  background-color: #434c48;
 }
 
-.button_group .round_button {
-  height: 40px;
-}
-
-.button_group .flat_button {
-  height: 15px;
-}
-
+/* Speaker Grill */
 #speaker {
-  position: relative;
-  left: 70%;
-  top: 15%;
+  position: absolute;
+  right: 26px;
+  bottom: 28px;
+  width: 56px;
+  height: 56px;
+  opacity: 0.7;
+  cursor: pointer;
+  transition: opacity 0.2s, transform 0.1s;
+}
+
+#speaker:hover {
+  opacity: 1;
+  transform: scale(1.05);
+}
+
+/* Keyboard Hints for PC */
+#keyboard_hints {
+  margin-top: 14px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border-radius: 8px;
+  padding: 8px 14px;
+  color: #e0e0e0;
+  font-size: 11px;
+  text-align: center;
+  max-width: 500px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+}
+
+.hint-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+}
+
+.hint-row span b {
+  color: #49c5b6;
+}
+
+.status-row {
+  margin-top: 6px;
+  padding-top: 6px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  gap: 14px;
+}
+
+.badge {
+  font-size: 11px;
+  color: #a0aec0;
+  cursor: pointer;
+  transition: color 0.15s;
+}
+
+.badge.active {
+  color: #48bb78;
+}
+
+.mini-btn {
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #fff;
+  border-radius: 4px;
+  padding: 2px 7px;
+  font-size: 11px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.mini-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* Responsive Scaling for mobile viewports */
+@media (max-width: 400px) {
+  body {
+    padding: 6px 4px;
+  }
+  #gameboy_container {
+    padding: 0;
+  }
+  #gameboy_shell {
+    transform: scale(0.92);
+    transform-origin: center top;
+  }
+  #keyboard_hints {
+    display: none;
+  }
+}
+
+@media (max-width: 360px) {
+  #gameboy_shell {
+    transform: scale(0.84);
+    transform-origin: center top;
+  }
+}
+
+@media (max-width: 320px) {
+  #gameboy_shell {
+    transform: scale(0.74);
+    transform-origin: center top;
+  }
+}
+
+@media (max-height: 700px) and (min-width: 401px) {
+  #gameboy_shell {
+    transform: scale(0.9);
+    transform-origin: center center;
+  }
+  #keyboard_hints {
+    margin-top: 4px;
+    padding: 4px 10px;
+  }
 }
