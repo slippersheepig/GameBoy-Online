@@ -127,7 +127,7 @@ windowStack.prototype.center = function () {
   var docLeft = Math.max(document.documentElement.scrollLeft, document.getElementsByTagName("body")[0].scrollLeft);
   var docTop = Math.max(document.documentElement.scrollTop, document.getElementsByTagName("body")[0].scrollTop);
   this.domObject.style.left = Math.round(((docWidth - this.domObject.offsetWidth) / 2) + docLeft) + "px";
-  this.domObject.style.top = Math.round(((docHeight - this.domObject.offsetHeight) / 2) + docTop) + "px";
+  this.domObject.style.top = Math.max(Math.round(((docHeight - this.domObject.offsetHeight) / 2) + docTop), 84) + "px";
 }
 windowStack.prototype.hide = function () {
   this.domObject.style.display = "none";
