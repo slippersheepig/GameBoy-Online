@@ -130,11 +130,11 @@ XAudioServer.prototype.executeCallback = function () {
 //DO NOT CALL THIS, the lib calls this internally!
 XAudioServer.prototype.initializeAudio = function () {
     try {
-        this.initializeMozAudio();
+        this.initializeWebAudio();
     }
     catch (error) {
         try {
-            this.initializeWebAudio();
+            this.initializeMozAudio();
         }
         catch (error) {
             try {
@@ -183,17 +183,39 @@ XAudioServer.prototype.initializeMozAudio = function () {
     this.initializeResampler(XAudioJSMozAudioSampleRate);
 }
 XAudioServer.prototype.initializeWebAudio = function () {
-  if (!XAudioJSWebAudioLaunchedContext) {
+  if (!XAudioJSWebAudioLaunchedContext || !XAudioJSWebAudioContextHandle) {
         try {
-            XAudioJSWebAudioContextHandle = new AudioContext();                //Create a system audio context.
+            var AudioContextClass = window.AudioContext || window.webkitAudioContext;
+            if (AudioContextClass) {
+                XAudioJSWebAudioContextHandle = new AudioContextClass();
+            }
         }
         catch (error) {
-            XAudioJSWebAudioContextHandle = new webkitAudioContext();              //Create a system audio context.
         }
         XAudioJSWebAudioLaunchedContext = true;
     }
+    if (!XAudioJSWebAudioContextHandle) {
+        throw new Error("AudioContext is not supported.");
+    }
+    // Set up auto-resume on first user gesture if context is suspended by autoplay policy
+    var resumeContext = function () {
+        if (XAudioJSWebAudioContextHandle && XAudioJSWebAudioContextHandle.state === "suspended") {
+            XAudioJSWebAudioContextHandle.resume().then(function () {
+                if (typeof window.onXAudioResumed === "function") {
+                    window.onXAudioResumed();
+                }
+            }).catch(function () {});
+        }
+    };
+    if (typeof window !== "undefined") {
+        ["click", "touchstart", "touchend", "mousedown", "keydown"].forEach(function (evt) {
+            window.addEventListener(evt, resumeContext, { passive: true });
+        });
+    }
     if (XAudioJSWebAudioAudioNode) {
-        XAudioJSWebAudioAudioNode.disconnect();
+        try {
+            XAudioJSWebAudioAudioNode.disconnect();
+        } catch (e) {}
         XAudioJSWebAudioAudioNode.onaudioprocess = null;
         XAudioJSWebAudioAudioNode = null;
     }
@@ -220,9 +242,11 @@ XAudioServer.prototype.initializeWebAudio = function () {
         }
         var parentObj = this;
         XAudioJSWebAudioWatchDogTimer = setInterval(function () {
-            var timeDiff = (new Date()).getTime() - XAudioJSWebAudioWatchDogLast;
-            if (timeDiff > 500) {
-                parentObj.initializeWebAudio();
+            if (XAudioJSWebAudioContextHandle && XAudioJSWebAudioContextHandle.state === "running") {
+                var timeDiff = (new Date()).getTime() - XAudioJSWebAudioWatchDogLast;
+                if (timeDiff > 500) {
+                    parentObj.initializeWebAudio();
+                }
             }
         }, 500);
     }
@@ -423,10 +447,10 @@ function XAudioJSWebAudioEvent(event) {    //Web Audio API callback...
   //Copy samples from XAudioJS to the Web Audio API:
   for (var index = 0; index < XAudioJSSamplesPerCallback && XAudioJSResampleBufferStart != XAudioJSResampleBufferEnd; ++index) {
     for (bufferCount = 0; bufferCount < XAudioJSChannelsAllocated; ++bufferCount) {
-      buffers[bufferCount][index] = XAudioJSResampledBuffer[XAudioJSResampleBufferStart++] * XAudioJSVolume;
-    }
-    if (XAudioJSResampleBufferStart == XAudioJSResampleBufferSize) {
-      XAudioJSResampleBufferStart = 0;
+      buffers[bufferCount][index] = (XAudioJSResampledBuffer[XAudioJSResampleBufferStart++] || 0) * XAudioJSVolume;
+      if (XAudioJSResampleBufferStart >= XAudioJSResampleBufferSize) {
+        XAudioJSResampleBufferStart = 0;
+      }
     }
   }
   //Pad with silence if we're underrunning:
@@ -469,12 +493,12 @@ function XAudioJSResampleRefill() {
     var resampledResult = XAudioJSResampleControl.outputBuffer;
     for (var index2 = 0; index2 < resampleLength;) {
       XAudioJSResampledBuffer[XAudioJSResampleBufferEnd++] = resampledResult[index2++];
-      if (XAudioJSResampleBufferEnd == XAudioJSResampleBufferSize) {
+      if (XAudioJSResampleBufferEnd >= XAudioJSResampleBufferSize) {
         XAudioJSResampleBufferEnd = 0;
       }
       if (XAudioJSResampleBufferStart == XAudioJSResampleBufferEnd) {
         XAudioJSResampleBufferStart += XAudioJSChannelsAllocated;
-        if (XAudioJSResampleBufferStart == XAudioJSResampleBufferSize) {
+        if (XAudioJSResampleBufferStart >= XAudioJSResampleBufferSize) {
           XAudioJSResampleBufferStart = 0;
         }
       }
@@ -504,4 +528,14 @@ function XAudioJSGetArraySlice(buffer, lengthOf) {
       return buffer.slice(0, lengthOf);
     }
   }
+}
+if (typeof window !== "undefined") {
+  window.XAudioJSResumeContext = function () {
+    if (typeof XAudioJSWebAudioContextHandle !== "undefined" && XAudioJSWebAudioContextHandle) {
+      if (XAudioJSWebAudioContextHandle.state === "suspended") {
+        return XAudioJSWebAudioContextHandle.resume();
+      }
+    }
+    return Promise.resolve();
+  };
 }
