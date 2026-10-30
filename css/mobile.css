@@ -510,6 +510,8 @@ body {
 }
 
 .mini-btn {
+  display: inline-block;
+  text-decoration: none;
   background: rgba(255, 255, 255, 0.12);
   border: 1px solid rgba(255, 255, 255, 0.2);
   color: #fff;
@@ -522,6 +524,14 @@ body {
 
 .mini-btn:hover {
   background: rgba(255, 255, 255, 0.2);
+}
+
+.game-tip {
+  display: block;
+  margin: 6px 0 2px 0;
+  color: #f6ad55;
+  font-size: 11px;
+  font-weight: 500;
 }
 
 /* Responsive Scaling for mobile viewports */
