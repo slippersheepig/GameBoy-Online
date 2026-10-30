@@ -1,65 +1,83 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-CN">
   <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>GameBoy Online (Pocket)</title>
+    <link rel="icon" type="image/png" href="images/128.png">
     <link rel="stylesheet" href="css/mobile.css"/>
   </head>
   <body>
-    <div id="gameboy_shell">
-      <span id="on_off">OFF ! ! ON</span>
-      <div id="screen_cover">
-        <div id="power">
-          <div class="two_column">
-            <div id="power_light"></div>
-            <div>)))</div>
+    <div id="gameboy_container">
+      <div id="gameboy_shell">
+        <span id="on_off">OFF ! ! ON</span>
+        <div id="screen_cover">
+          <div id="power">
+            <div class="two_column">
+              <div id="power_light"></div>
+              <div>)))</div>
+            </div>
+            POWER
           </div>
-          POWER
-        </div>
-        <div id="canvas_container">
-          <canvas id="mainCanvas" width="320" height="288"></canvas>
-        </div>
-        <div>
-          GameBoy <span id="pocket">Pocket</span>
-        </div>
-      </div>
-      <div id="nintendo">Nintendo</div>
-      <div id="d_pad">
-        <div id="d_pad_up">
-          <div id="arrow_up" data-key-zone="up"></div>
-        </div>
-        <div id="d_pad_left_right">
-          <div id="d_pad_left">
-            <div id="arrow_left" data-key-zone="left"></div>
+          <div id="canvas_container">
+            <canvas id="mainCanvas" width="320" height="288"></canvas>
+            <div id="screen_overlay" class="hidden">点击加载 ROM 文件</div>
           </div>
-          <div id="d_pad_right">
-            <div id="arrow_right" data-key-zone="right"></div>
+          <div id="brand_pocket">
+            GameBoy <span id="pocket">Pocket</span>
           </div>
-          <div id="d_pad_center"></div>
         </div>
-        <div id="d_pad_down">
-          <div id="arrow_down" data-key-zone="down"></div>
+        <div id="nintendo">Nintendo</div>
+        <div id="d_pad">
+          <div id="d_pad_up" data-key-zone="up">
+            <div id="arrow_up" data-key-zone="up"></div>
+          </div>
+          <div id="d_pad_left_right">
+            <div id="d_pad_left" data-key-zone="left">
+              <div id="arrow_left" data-key-zone="left"></div>
+            </div>
+            <div id="d_pad_center"></div>
+            <div id="d_pad_right" data-key-zone="right">
+              <div id="arrow_right" data-key-zone="right"></div>
+            </div>
+          </div>
+          <div id="d_pad_down" data-key-zone="down">
+            <div id="arrow_down" data-key-zone="down"></div>
+          </div>
+        </div>
+        <div id="a_button_group" class="button_group" data-key-zone="a">
+          <div class="round_button" data-key-zone="a"></div>
+          A
+        </div>
+        <div id="b_button_group" class="button_group" data-key-zone="b">
+          <div class="round_button" data-key-zone="b"></div>
+          B
+        </div>
+        <div id="select_button_group" class="button_group" data-key-zone="select">
+          <div class="flat_button" data-key-zone="select"></div>
+          <span>SELECT</span>
+        </div>
+        <div id="start_button_group" class="button_group" data-key-zone="start">
+          <div class="flat_button" data-key-zone="start"></div>
+          <span>START</span>
+        </div>
+        <img id="speaker" src="images/speaker.png" title="扬声器 / 点击切换声音"/>
+      </div>
+      <div id="keyboard_hints">
+        <div class="hint-row">
+          <span><b>方向键 / WASD</b>: 移动</span>
+          <span><b>K / X</b>: A键</span>
+          <span><b>J / Z</b>: B键</span>
+          <span><b>Enter</b>: 开始</span>
+          <span><b>Shift / 空格</b>: 选择</span>
+        </div>
+        <div class="hint-row status-row">
+          <span id="audio_status_badge" class="badge">🔊 声音：点击或按键开启</span>
+          <button id="load_rom_btn" class="mini-btn">打开本地 ROM</button>
         </div>
       </div>
-      <div id="a_button_group" class="button_group" data-key-zone="a">
-        <div class="round_button"></div>
-        A
-      </div>
-      <div id="b_button_group" class="button_group" data-key-zone="b">
-        <div class="round_button"></div>
-        B
-      </div>
-      <div id="select_button_group" class="button_group" data-key-zone="select">
-        <div class="flat_button"></div>
-        SELECT
-      </div>
-      <div id="start_button_group" class="button_group" data-key-zone="start">
-        <div class="flat_button"></div>
-        START
-      </div>
-      <img id="speaker" src="images/speaker.png"/>
+      <input type="file" id="local_rom_input" accept=".gb,.gbc" style="display:none;" />
     </div>
-    <script src="js/other/mobile.js"></script>
     <script src="js/other/base64.js"></script>
     <script src="js/other/json2.js"></script>
     <script src="js/other/swfobject.js"></script>
@@ -68,5 +86,6 @@
     <script src="js/other/resize.js"></script>
     <script src="js/GameBoyCore.js"></script>
     <script src="js/GameBoyIO.js"></script>
+    <script src="js/other/mobile.js"></script>
   </body>
 </html>
