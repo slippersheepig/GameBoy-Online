@@ -25,12 +25,34 @@
     <script src="js/GameBoyIO.js"></script>
   </head>
   <body>
+    <!-- 移动端 / 掌机模式跳转入口 -->
+    <a href="mobile.html" id="mobile_mode_banner" class="mobile-mode-banner" title="切换到 GameBoy Pocket 掌机复古模式">
+      <div class="banner-icon">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+          <path d="M17 1.01L7 1c-1.1 0-2 .9-2 2v18c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V3c0-1.1-.9-1.99-2-1.99zM17 19H7V5h10v14zm-5-3c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z"/>
+        </svg>
+      </div>
+      <div class="banner-content">
+        <div class="banner-title">
+          <span class="badge-pill">掌机模式</span>
+          <span class="banner-text">GameBoy Pocket 复古模式</span>
+          <span class="badge-tag">mobile.html</span>
+        </div>
+        <div class="banner-desc">精美复古机身 · 触屏与全键盘操作 · 点击立即体验</div>
+      </div>
+      <div class="banner-arrow">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+          <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/>
+        </svg>
+      </div>
+    </a>
     <div id="GameBoy" class="window">
       <div class="menubar">
         <span id="GameBoy_file_menu">文件</span>
         <span id="GameBoy_settings_menu">设置</span>
         <span id="GameBoy_view_menu">视图</span>
         <span id="GameBoy_about_menu">关于</span>
+        <a href="mobile.html" class="menubar_mobile_link">📱 掌机模式</a>
       </div>
       <div id="gfx">
         <canvas id="mainCanvas"></canvas>
