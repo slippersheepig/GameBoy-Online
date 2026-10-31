@@ -98,6 +98,14 @@ windowStack.prototype.drag = function (event) {
     else if (!this.mousedInsideWindow) {
       this.domObject.style.left = this.lastLeft + "px";
       this.domObject.style.top = this.lastTop + "px";
+      if (this.domObject.id === "GameBoy") {
+        var banner = document.getElementById("mobile_mode_banner");
+        if (banner) {
+          var bannerHeight = banner.offsetHeight || 58;
+          banner.style.top = Math.max(this.lastTop - bannerHeight - 14, 10) + "px";
+          banner.style.left = (this.lastLeft + Math.round(this.domObject.offsetWidth / 2)) + "px";
+        }
+      }
     }
     this.coordDiffLeft = this.leftLast = event.clientX;
     this.coordDiffTop = this.topLast = event.clientY;
@@ -127,7 +135,16 @@ windowStack.prototype.center = function () {
   var docLeft = Math.max(document.documentElement.scrollLeft, document.getElementsByTagName("body")[0].scrollLeft);
   var docTop = Math.max(document.documentElement.scrollTop, document.getElementsByTagName("body")[0].scrollTop);
   this.domObject.style.left = Math.round(((docWidth - this.domObject.offsetWidth) / 2) + docLeft) + "px";
-  this.domObject.style.top = Math.max(Math.round(((docHeight - this.domObject.offsetHeight) / 2) + docTop), 84) + "px";
+  this.domObject.style.top = Math.max(Math.round(((docHeight - this.domObject.offsetHeight) / 2) + docTop), 80) + "px";
+  if (this.domObject.id === "GameBoy") {
+    var banner = document.getElementById("mobile_mode_banner");
+    if (banner) {
+      var gbTop = parseInt(this.domObject.style.top, 10);
+      var bannerHeight = banner.offsetHeight || 58;
+      banner.style.top = Math.max(gbTop - bannerHeight - 14, 10) + "px";
+      banner.style.left = (parseInt(this.domObject.style.left, 10) + Math.round(this.domObject.offsetWidth / 2)) + "px";
+    }
+  }
 }
 windowStack.prototype.hide = function () {
   this.domObject.style.display = "none";
