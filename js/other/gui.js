@@ -364,7 +364,12 @@ function registerGUIEvents() {
   addEvent("click", document.getElementById("view_terminal"), function () { windowStacks[1].show(); });
   addEvent("click", document.getElementById("view_instructions"), function () { windowStacks[5].show(); });
   addEvent("mouseup", document.getElementById("gfx"), initNewCanvasSize);
-  addEvent("resize", window, initNewCanvasSize);
+  addEvent("resize", window, function () {
+    initNewCanvasSize();
+    if (windowStacks && windowStacks[0]) {
+      windowStacks[0].center();
+    }
+  });
   addEvent("unload", window, function () {
     autoSave();
   });
