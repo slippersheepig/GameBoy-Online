@@ -786,8 +786,8 @@ ul.menu>li:hover>ul.menu {
    Mobile Mode Entrance Banner (Placed above the main window)
    ======================================================== */
 .mobile-mode-banner {
-  position: fixed;
-  top: 18px;
+  position: absolute;
+  top: max(14px, calc(50% - 248px));
   left: 50%;
   transform: translateX(-50%);
   z-index: 1000;
