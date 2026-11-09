@@ -96,9 +96,9 @@ body {
 /* Power Indicator */
 #power {
   position: absolute;
-  left: 9px;
+  left: 4px;
   top: 72px;
-  width: 38px;
+  width: 32px;
   text-align: center;
   font-size: 7px;
   font-weight: bold;
