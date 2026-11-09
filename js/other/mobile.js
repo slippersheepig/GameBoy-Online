@@ -323,8 +323,10 @@ function pickRandomColor() {
     shell.style.backgroundColor = colorObj.shell;
   }
   if (nintendo) {
-    nintendo.style.borderColor = colorObj.border;
-    nintendo.style.color = colorObj.border;
+    //Use a fixed dark ink color for the logo so it stays readable on every shell color.
+    var logoInk = "#2b2e2d";
+    nintendo.style.borderColor = logoInk;
+    nintendo.style.color = logoInk;
   }
 }
 
