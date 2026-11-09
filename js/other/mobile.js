@@ -64,8 +64,11 @@ function toggleAudio() {
     } else if (XAudioJSWebAudioContextHandle.state === "running") {
       if (typeof settings !== "undefined") {
         settings[0] = !settings[0];
-        if (typeof gameboy === "object" && gameboy && typeof gameboy.changeVolume === "function") {
-          gameboy.changeVolume();
+        // initSound() matches the desktop sound checkbox: it mutes via changeVolume(0)
+        // when settings[0] is false, and rebuilds the audio server when true.
+        // (changeVolume() alone is a no-op while settings[0] is false.)
+        if (typeof gameboy === "object" && gameboy && typeof gameboy.initSound === "function") {
+          gameboy.initSound();
         }
         updateAudioBadge(settings[0]);
       }
