@@ -799,7 +799,7 @@ ul.menu>li:hover>ul.menu {
   -webkit-backdrop-filter: blur(16px);
   border: 1px solid rgba(255, 255, 255, 0.8);
   border-radius: 50px;
-  box-shadow: 
+  box-shadow:
     0 10px 30px rgba(0, 0, 0, 0.12),
     0 2px 6px rgba(0, 0, 0, 0.06),
     inset 0 1px 0 rgba(255, 255, 255, 0.95);
@@ -813,7 +813,7 @@ ul.menu>li:hover>ul.menu {
 .mobile-mode-banner:hover {
   transform: translateX(-50%) translateY(-2px);
   background: rgba(255, 255, 255, 0.98);
-  box-shadow: 
+  box-shadow:
     0 16px 38px rgba(0, 0, 0, 0.18),
     0 4px 10px rgba(0, 0, 0, 0.08),
     0 0 0 2px #3b82f6;
@@ -903,4 +903,26 @@ a.menubar_mobile_link:hover {
   background: rgba(59, 130, 246, 0.22);
   color: #1e40af;
   box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+/* Narrow viewports: keep the mobile-mode banner inside the viewport */
+@media (max-width: 520px) {
+  .mobile-mode-banner {
+    gap: 8px;
+    padding: 8px 12px;
+    border-radius: 24px;
+    max-width: calc(100vw - 16px);
+  }
+
+  .mobile-mode-banner .banner-content {
+    max-width: calc(100vw - 120px);
+  }
+
+  .mobile-mode-banner .banner-desc {
+    display: none;
+  }
+
+  .mobile-mode-banner .banner-title {
+    font-size: 12px;
+  }
 }
