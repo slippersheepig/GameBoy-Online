@@ -491,7 +491,7 @@ function refreshFreezeListing() {
   storageListMasterDivSub.id = "freezeListingMasterContainerSub";
   var keys = getLocalStorageKeys();
   while (keys.length > 0) {
-    key = keys.shift();
+    var key = keys.shift();
     if (key.substring(0, 7) == "FREEZE_") {
       storageListMasterDivSub.appendChild(outputFreezeStateRequestLink(key));
     }
@@ -631,7 +631,6 @@ function findKey(keyNum) {
     //An older Gecko 1.8.1/1.9.0 method of storage (Deprecated due to the obvious security hole):
     return window.globalStorage[location.hostname].key(keyNum);
   }
-  return null;
 }
 //Some wrappers and extensions for non-DOM3 browsers:
 function isDescendantOf(ParentElement, toCheck) {
