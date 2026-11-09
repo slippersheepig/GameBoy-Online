@@ -260,7 +260,7 @@
         var controls = document.getElementById('gb-virtual-controls');
         if (!game || !controls) return;
         var lastRect = null;
-      
+
         function applyPos(rect) {
           var left = Math.round(rect.left + (window.pageXOffset || document.documentElement.scrollLeft || 0));
           var top = Math.round(rect.bottom + (window.pageYOffset || document.documentElement.scrollTop || 0) + 8);
@@ -274,7 +274,7 @@
           controls.style.setProperty('transform', 'none', 'important');
           controls.style.setProperty('z-index', '10001', 'important');
         }
-      
+
         function updateIfNeeded() {
           var r = game.getBoundingClientRect();
           if (r.width === 0 && r.height === 0) {
