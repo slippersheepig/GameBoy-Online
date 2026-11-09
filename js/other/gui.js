@@ -99,8 +99,11 @@ function registerGUIEvents() {
     if (GameBoyEmulatorInitialized()) {
       var volume = prompt("在下方设置游戏音量：", "1.0");
       if (volume != null && volume.length > 0) {
-        settings[3] = Math.min(Math.max(parseFloat(volume), 0), 1);
-        gameboy.changeVolume();
+        var volumeValue = parseFloat(volume);
+        if (!isNaN(volumeValue)) {
+          settings[3] = Math.min(Math.max(volumeValue, 0), 1);
+          gameboy.changeVolume();
+        }
       }
     }
   });
@@ -108,7 +111,10 @@ function registerGUIEvents() {
     if (GameBoyEmulatorInitialized()) {
       var speed = prompt("在下方设置游戏速度：", "1.0");
       if (speed != null && speed.length > 0) {
-        gameboy.setSpeed(Math.max(parseFloat(speed), 0.001));
+        var speedValue = parseFloat(speed);
+        if (!isNaN(speedValue)) {
+          gameboy.setSpeed(Math.max(speedValue, 0.001));
+        }
       }
     }
   });
@@ -143,7 +149,7 @@ function registerGUIEvents() {
               else {
                 cout("loading file, please wait...", 0);
               }
-            }
+            };
             binaryHandle.readAsBinaryString(this.files[this.files.length - 1]);
           }
           catch (error) {
@@ -223,11 +229,10 @@ function registerGUIEvents() {
                     try {
                       if (typeof gameboy == "object" && gameboy && gameboy.name && gameboy.name == targetName) {
                         var rawArr = base64ToArray(b64);
-                        var mbcSize = (gameboy.numRAMBanks ? gameboy.numRAMBanks * 0x2000 : rawArr.length);
-                        var typed = gameboy.getTypedArray(mbcSize, 0, "uint8");
-                        var len = Math.min(rawArr.length, typed.length);
-                        for (var i = 0; i < len; i++) typed[i] = rawArr[i];
-                        gameboy.MBCRam = typed;
+                        // Use the core's own conversion (the same path setupRAM() takes when
+                        // loading SRAM), so non-standard save sizes (e.g. 512-byte MBC2
+                        // saves, where numRAMBanks is fractional) are not truncated:
+                        gameboy.MBCRam = gameboy.toTypedArray(rawArr, "uint8");
                         cout("Applied RAW SRAM to running emulator (MBCRam updated).", 0);
                       }
                     }
