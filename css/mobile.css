@@ -33,7 +33,7 @@ body {
   border-top-right-radius: 16px;
   border-bottom-left-radius: 16px;
   border-bottom-right-radius: 50px;
-  box-shadow: 
+  box-shadow:
     0 20px 45px rgba(0, 0, 0, 0.7),
     inset -8px -8px 16px rgba(0, 0, 0, 0.25),
     inset 8px 8px 16px rgba(255, 255, 255, 0.35);
@@ -81,7 +81,7 @@ body {
   border-top-right-radius: 8px;
   border-bottom-left-radius: 8px;
   border-bottom-right-radius: 28px;
-  box-shadow: 
+  box-shadow:
     inset 2px 2px 6px rgba(0, 0, 0, 0.5),
     inset -2px -2px 6px rgba(255, 255, 255, 0.1),
     0 3px 6px rgba(0, 0, 0, 0.3);
@@ -380,7 +380,7 @@ body {
   border-radius: 50%;
   background-color: #2e3532;
   margin: 0 auto 4px auto;
-  box-shadow: 
+  box-shadow:
     inset 1px 1px 2px rgba(255, 255, 255, 0.35),
     inset -2px -2px 4px rgba(0, 0, 0, 0.6),
     0 4px 6px rgba(0, 0, 0, 0.35);
@@ -412,7 +412,7 @@ body {
   background-color: #525E59;
   margin: 0 auto 6px auto;
   transform: rotate(-25deg);
-  box-shadow: 
+  box-shadow:
     inset 1px 1px 1px rgba(255, 255, 255, 0.3),
     inset -1px -1px 2px rgba(0, 0, 0, 0.6),
     0 2px 4px rgba(0, 0, 0, 0.3);
