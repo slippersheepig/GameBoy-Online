@@ -13,10 +13,10 @@ Resampler.prototype.initialize = function () {
     if (this.fromSampleRate == this.toSampleRate) {
       //Setup a resampler bypass:
       this.resampler = this.bypassResampler;    //Resampler just returns what was passed through.
-            this.ratioWeight = 1;
+      this.ratioWeight = 1;
     }
     else {
-            this.ratioWeight = this.fromSampleRate / this.toSampleRate;
+      this.ratioWeight = this.fromSampleRate / this.toSampleRate;
       if (this.fromSampleRate < this.toSampleRate) {
         /*
           Use generic linear interpolation if upsampling,
