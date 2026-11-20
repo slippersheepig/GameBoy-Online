@@ -69,8 +69,14 @@ div#GameBoy {
 
 div#input_select,
 div#save_importer {
-  min-height: 100px;
-  min-width: 200px;
+  min-height: 110px;
+  min-width: 260px;
+}
+
+div#input_select>form,
+div#save_importer>form {
+  padding: 12px 14px;
+  margin: 0;
 }
 
 div#instructions {
@@ -115,7 +121,6 @@ div.menubar>span {
   background-color: transparent;
   padding: 2px 5px;
   margin: 3px 3px 3px 0;
-  display: inline;
   display: inline-block;
 }
 
@@ -166,7 +171,6 @@ div#gfx {
 }
 
 body>div#fullscreenContainer {
-  position: absolute;
   position: fixed;
   height: 100%;
   width: 100%;
@@ -176,7 +180,7 @@ body>div#fullscreenContainer {
   bottom: 0px;
   background-color: rgb(0, 0, 0);
   display: none;
-  z-index: 100;
+  z-index: 2000;
 }
 
 body>div#fullscreenContainer>canvas#fullscreen.maximum {
@@ -227,8 +231,8 @@ div#GameBoy>div#gfx>span#port_title {
   top: 45%;
   left: 55%;
   font-size: 32px;
-  color: rgb(180, 70, 70);
-  text-shadow: 2px 2px 4px rgb(80, 80, 80);
+  color: rgb(255, 235, 190);
+  text-shadow: 2px 2px 4px rgb(50, 30, 30);
   font-style: italic;
   font-weight: bold;
   z-index: 2;
@@ -279,12 +283,12 @@ div.storageList {
   overflow: auto;
   text-align: left;
   bottom: 50px;
-  background-color: rgb(140, 140, 140);
+  background-color: rgb(96, 96, 96);
   -webkit-border-radius: 3px;
   border-radius: 3px;
-  -webkit-box-shadow: inset 3px 3px 2px 1px rgb(110, 110, 110);
-  box-shadow: inset 3px 3px 2px 1px rgb(110, 110, 110);
-  padding: 3px;
+  -webkit-box-shadow: inset 3px 3px 2px 1px rgb(68, 68, 68);
+  box-shadow: inset 3px 3px 2px 1px rgb(68, 68, 68);
+  padding: 6px;
 }
 
 div#storageListingMasterContainer {
@@ -299,11 +303,11 @@ div#download_all_storage {
   right: 4px;
   text-align: center;
   font-weight: bold;
-  background-color: rgb(140, 140, 140);
+  background-color: rgb(96, 96, 96);
   -webkit-border-radius: 3px;
   border-radius: 3px;
-  -webkit-box-shadow: inset 3px 3px 2px 1px rgb(110, 110, 110);
-  box-shadow: inset 3px 3px 2px 1px rgb(110, 110, 110);
+  -webkit-box-shadow: inset 3px 3px 2px 1px rgb(68, 68, 68);
+  box-shadow: inset 3px 3px 2px 1px rgb(68, 68, 68);
   padding: 3px;
 }
 
@@ -390,14 +394,14 @@ div#settings>div#toggle_settings>div.setting {
   width: 100%;
   position: relative;
   margin: 0;
-  padding: 0 0 3px 0;
-  border: none;
+  padding: 3px 8px;
+  border-bottom: 1px dashed transparent;
+  box-sizing: border-box;
 }
 
 div#settings>div#toggle_settings>div.setting:hover {
-  border-bottom-style: dashed;
   border-bottom-color: rgb(70, 70, 70);
-  border-bottom-width: 1px;
+  background-color: rgba(255, 255, 255, 0.25);
 }
 
 div#settings>div#toggle_settings>div.setting input {
@@ -418,11 +422,12 @@ div.window>div.button_rack {
 
 div.window>div.button_rack>button {
   cursor: pointer;
-  padding: 0 12px;
+  padding: 0 18px;
   margin: 0;
-  height: 34px;
-  line-height: 32px;
-  width: 140px;
+  height: 32px;
+  line-height: 30px;
+  min-width: 110px;
+  width: auto;
   text-align: center;
   font-size: 13px;
   position: relative;
@@ -432,6 +437,7 @@ div.window>div.button_rack>button {
   color: #222;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.18);
   box-sizing: border-box;
+  transition: background 0.15s, border-color 0.15s;
 }
 
 div.window>div.button_rack>button:hover {
@@ -455,7 +461,6 @@ div.window>div.button_rack>button.right {
 }
 
 div.window>div.button_rack>button.center {
-  width: 140px;
   margin: 0 auto;
   display: inline-block;
   float: none;
@@ -472,7 +477,7 @@ ul.menu {
   padding: 0;
   top: 0;
   left: 0;
-  z-index: 3;
+  z-index: 1000;
   background-color: rgb(200, 200, 200);
   background-repeat: repeat-x;
   background-attachment: scroll;
@@ -498,7 +503,6 @@ ul.menu {
 }
 
 ul.menu:hover {
-  display: block;
   display: inline-block;
   top: 0;
   left: 0;
@@ -525,7 +529,6 @@ ul.menu>li:hover {
 ul.menu>li:hover>ul.menu {
   left: 220px;
   top: 0;
-  display: block;
   display: inline-block;
 }
 
@@ -568,12 +571,12 @@ ul.menu>li:hover>ul.menu {
     ". down .";
   grid-template-columns: 1fr auto 1fr;
   grid-template-rows: auto auto auto;
-  gap: 8px;
+  gap: 6px;
   flex: 0 0 auto;
-  width: 160px;
-  max-width: 60%;
-  min-width: 120px;
-  height: 160px;
+  width: 144px;
+  max-width: 55%;
+  min-width: 112px;
+  height: 144px;
   place-items: center;
   box-sizing: border-box;
 }
@@ -585,7 +588,7 @@ ul.menu>li:hover>ul.menu {
   background: #1e2023;
   color: #eee;
   border-radius: 8px;
-  box-shadow: 0 5px 0 #0d0e10;
+  box-shadow: 0 4px 0 #0d0e10;
   font-weight: 700;
   display: flex;
   align-items: center;
@@ -593,40 +596,41 @@ ul.menu>li:hover>ul.menu {
   cursor: pointer;
   user-select: none;
   padding: 0;
-  font-size: 20px;
+  font-size: 18px;
   line-height: 1;
 }
 
 .gb-dpad-up {
   grid-area: up;
-  width: 56px;
-  height: 44px;
+  width: 50px;
+  height: 40px;
   border-radius: 8px;
 }
 
 .gb-dpad-down {
   grid-area: down;
-  width: 56px;
-  height: 44px;
+  width: 50px;
+  height: 40px;
   border-radius: 8px;
 }
 
 .gb-dpad-left {
   grid-area: left;
-  width: 44px;
-  height: 56px;
+  width: 40px;
+  height: 50px;
   border-radius: 8px;
 }
 
 .gb-dpad-right {
   grid-area: right;
-  width: 44px;
-  height: 56px;
+  width: 40px;
+  height: 50px;
   border-radius: 8px;
 }
 
-.gb-dpad button:active {
-  transform: translateY(3px);
+.gb-dpad button:active,
+.gb-dpad button.active {
+  transform: translateY(2px);
   box-shadow: 0 2px 0 #0d0e10;
 }
 
@@ -634,10 +638,10 @@ ul.menu>li:hover>ul.menu {
   display: block;
   position: relative;
   flex: 0 0 auto;
-  width: 180px;
-  height: 160px;
+  width: 156px;
+  height: 144px;
   box-sizing: border-box;
-  min-width: 120px;
+  min-width: 112px;
 }
 
 .gb-btn {
@@ -649,7 +653,7 @@ ul.menu>li:hover>ul.menu {
   background: #1e2023;
   color: #fff;
   padding: 6px;
-  box-shadow: 0 5px 0 rgba(0, 0, 0, 0.5);
+  box-shadow: 0 4px 0 rgba(0, 0, 0, 0.5);
   border-radius: 10px;
   font-weight: 700;
   display: inline-flex;
@@ -658,27 +662,30 @@ ul.menu>li:hover>ul.menu {
   box-sizing: border-box;
 }
 
-.gb-btn:active {
-  transform: translateY(3px);
+.gb-btn:active,
+.gb-btn.active {
+  transform: translateY(2px);
   box-shadow: 0 2px 0 rgba(0, 0, 0, 0.5);
 }
 
 .gb-ab .gb-btn.gb-a,
 .gb-ab .gb-btn.gb-b {
-  width: 76px;
-  height: 76px;
+  width: 64px;
+  height: 64px;
   border-radius: 50%;
-  font-size: 18px;
+  font-size: 17px;
   border: 2px solid #580d24;
   background: linear-gradient(145deg, #a81c47, #851235);
-  box-shadow: 0 6px 0 #4a091d;
+  box-shadow: 0 5px 0 #4a091d;
   color: #fff;
 }
 
 .gb-ab .gb-btn.gb-a:active,
-.gb-ab .gb-btn.gb-b:active {
+.gb-ab .gb-btn.gb-a.active,
+.gb-ab .gb-btn.gb-b:active,
+.gb-ab .gb-btn.gb-b.active {
   transform: translateY(3px);
-  box-shadow: 0 3px 0 #4a091d;
+  box-shadow: 0 2px 0 #4a091d;
 }
 
 .gb-ab .gb-btn.gb-b {
@@ -721,36 +728,38 @@ ul.menu>li:hover>ul.menu {
 }
 
 .gb-btn.gb-select:active,
-.gb-btn.gb-start:active {
+.gb-btn.gb-select.active,
+.gb-btn.gb-start:active,
+.gb-btn.gb-start.active {
   transform: translateY(2px);
   box-shadow: 0 2px 0 rgba(0, 0, 0, 0.45);
 }
 
 @media (max-width: 420px) {
   .gb-dpad {
-    width: 132px;
-    height: 132px;
-    gap: 6px;
+    width: 128px;
+    height: 128px;
+    gap: 5px;
     min-width: 96px;
   }
 
   .gb-dpad-up,
   .gb-dpad-down {
-    width: 48px;
+    width: 46px;
     height: 36px;
   }
 
   .gb-dpad-left,
   .gb-dpad-right {
     width: 36px;
-    height: 48px;
+    height: 46px;
   }
 
-  .gb-btn.gb-a,
-  .gb-btn.gb-b {
-    width: 64px;
-    height: 64px;
-    font-size: 16px;
+  .gb-ab .gb-btn.gb-a,
+  .gb-ab .gb-btn.gb-b {
+    width: 56px;
+    height: 56px;
+    font-size: 15px;
   }
 
   .gb-btn.gb-select,
@@ -766,8 +775,8 @@ ul.menu>li:hover>ul.menu {
   }
 
   .gb-ab {
-    width: 140px;
-    height: 120px;
+    width: 136px;
+    height: 118px;
   }
 
   .gb-ab .gb-btn.gb-b {
@@ -781,15 +790,13 @@ ul.menu>li:hover>ul.menu {
   }
 }
 
-/* ========================================================
-   Mobile Mode Entrance Banner (Placed above the main window)
-   ======================================================== */
+/* Mobile Mode Entrance Banner (Placed above the main window) */
 .mobile-mode-banner {
   position: absolute;
   top: max(14px, calc(50% - 248px));
   left: 50%;
   transform: translateX(-50%);
-  z-index: 1000;
+  z-index: 1;
   display: flex;
   align-items: center;
   gap: 14px;
