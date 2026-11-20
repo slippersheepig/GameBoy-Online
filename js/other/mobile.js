@@ -1,7 +1,4 @@
-var inFullscreen = false;
 var mainCanvas = null;
-var fullscreenCanvas = null;
-var showAsMinimal = false;
 
 // Key mappings for PC keyboard supporting both keyCode, event.key and event.code
 var keyMap = {
@@ -9,8 +6,8 @@ var keyMap = {
   "down": { codes: [40, 83], keys: ["ArrowDown", "s", "S", "Down"], codeNames: ["ArrowDown", "KeyS"] },
   "left": { codes: [37, 65], keys: ["ArrowLeft", "a", "A", "Left"], codeNames: ["ArrowLeft", "KeyA"] },
   "right": { codes: [39, 68], keys: ["ArrowRight", "d", "D", "Right"], codeNames: ["ArrowRight", "KeyD"] },
-  "a": { codes: [88, 75, 74], keys: ["x", "X", "k", "K", "j", "J"], codeNames: ["KeyX", "KeyK", "KeyJ"] },
-  "b": { codes: [90, 81, 89], keys: ["z", "Z", "q", "Q", "y", "Y"], codeNames: ["KeyZ", "KeyQ", "KeyY"] },
+  "a": { codes: [88, 75], keys: ["x", "X", "k", "K"], codeNames: ["KeyX", "KeyK"] },
+  "b": { codes: [90, 74, 81, 89], keys: ["z", "Z", "j", "J", "q", "Q", "y", "Y"], codeNames: ["KeyZ", "KeyJ", "KeyQ", "KeyY"] },
   "select": { codes: [16, 32, 8], keys: ["Shift", " ", "Backspace", "Spacebar"], codeNames: ["ShiftLeft", "ShiftRight", "Space", "Backspace"] },
   "start": { codes: [13], keys: ["Enter"], codeNames: ["Enter", "NumpadEnter"] }
 };
@@ -30,12 +27,13 @@ var cout = function (message, level) {
 // Resume AudioContext on any user interaction (Autoplay policy)
 function resumeAudioContext() {
   if (typeof XAudioJSWebAudioContextHandle !== "undefined" && XAudioJSWebAudioContextHandle) {
+    var soundEnabled = typeof settings === "undefined" || settings[0];
     if (XAudioJSWebAudioContextHandle.state === "suspended") {
       XAudioJSWebAudioContextHandle.resume().then(function () {
-        updateAudioBadge(true);
+        updateAudioBadge(soundEnabled);
       }).catch(function () {});
     } else if (XAudioJSWebAudioContextHandle.state === "running") {
-      updateAudioBadge(true);
+      updateAudioBadge(soundEnabled);
     }
   }
 }
@@ -46,7 +44,11 @@ function updateAudioBadge(isPlaying) {
     if (isPlaying) {
       badge.textContent = "🔊 声音：已启用";
       badge.className = "badge active";
-      badge.title = "声音正在正常播放";
+      badge.title = "声音正在正常播放（点击可静音）";
+    } else if (typeof settings !== "undefined" && !settings[0]) {
+      badge.textContent = "🔇 声音：已静音";
+      badge.className = "badge";
+      badge.title = "声音已静音（点击可开启声音）";
     } else {
       badge.textContent = "🔇 声音：点击或按键开启";
       badge.className = "badge";
@@ -58,15 +60,18 @@ function updateAudioBadge(isPlaying) {
 function toggleAudio() {
   if (typeof XAudioJSWebAudioContextHandle !== "undefined" && XAudioJSWebAudioContextHandle) {
     if (XAudioJSWebAudioContextHandle.state === "suspended") {
+      if (typeof settings !== "undefined" && !settings[0]) {
+        settings[0] = true;
+        if (typeof gameboy === "object" && gameboy && typeof gameboy.initSound === "function") {
+          gameboy.initSound();
+        }
+      }
       XAudioJSWebAudioContextHandle.resume().then(function () {
         updateAudioBadge(true);
-      });
+      }).catch(function () {});
     } else if (XAudioJSWebAudioContextHandle.state === "running") {
       if (typeof settings !== "undefined") {
         settings[0] = !settings[0];
-        // initSound() matches the desktop sound checkbox: it mutes via changeVolume(0)
-        // when settings[0] is false, and rebuilds the audio server when true.
-        // (changeVolume() alone is a no-op while settings[0] is false.)
         if (typeof gameboy === "object" && gameboy && typeof gameboy.initSound === "function") {
           gameboy.initSound();
         }
@@ -311,25 +316,17 @@ function keyUp(event) {
 }
 
 var gameBoyColors = [
-  { shell: "#33B678", border: "#227b51" }, // Emerald Green
-  { shell: "#FFDC2B", border: "#c2a30b" }, // Canary Yellow
-  { shell: "#F61300", border: "#aa0c00" }, // Ruby Red
-  { shell: "#0356F2", border: "#023ca8" }, // Cobalt Blue
-  { shell: "#68707a", border: "#464d55" }  // Classic Silver/Grey
+  "#33B678", // Emerald Green
+  "#F5D130", // Canary Yellow
+  "#E54B3C", // Pocket Red
+  "#3B7CE8", // Cobalt Blue
+  "#8C949E"  // Classic Silver/Grey
 ];
 
 function pickRandomColor() {
-  var nintendo = document.getElementById("nintendo");
   var shell = document.getElementById("gameboy_shell");
-  var colorObj = gameBoyColors[(gameBoyColors.length * Math.random()) | 0];
   if (shell) {
-    shell.style.backgroundColor = colorObj.shell;
-  }
-  if (nintendo) {
-    //Use a fixed dark ink color for the logo so it stays readable on every shell color.
-    var logoInk = "#2b2e2d";
-    nintendo.style.borderColor = logoInk;
-    nintendo.style.color = logoInk;
+    shell.style.backgroundColor = gameBoyColors[(gameBoyColors.length * Math.random()) | 0];
   }
 }
 
@@ -344,32 +341,25 @@ function setupAudioListeners() {
 
   var speaker = document.getElementById("speaker");
   if (speaker) {
-    speaker.addEventListener("click", function () {
+    speaker.addEventListener("click", function (e) {
+      e.stopPropagation();
       toggleAudio();
     });
   }
 
   var badge = document.getElementById("audio_status_badge");
   if (badge) {
-    badge.addEventListener("click", function () {
-      resumeAudioContext();
+    badge.addEventListener("click", function (e) {
+      e.stopPropagation();
+      toggleAudio();
     });
   }
 }
 
 function setupRomLoader() {
   var romInput = document.getElementById("local_rom_input");
-  var loadBtn = document.getElementById("load_rom_btn");
   var overlay = document.getElementById("screen_overlay");
 
-  if (loadBtn && romInput) {
-    loadBtn.addEventListener("click", function (e) {
-      // If triggered by label, native click handles it; otherwise invoke:
-      if (e.target.tagName !== "LABEL") {
-        romInput.click();
-      }
-    });
-  }
   if (overlay && romInput) {
     overlay.addEventListener("click", function () {
       romInput.click();
