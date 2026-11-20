@@ -54,6 +54,7 @@ function registerGUIEvents() {
   cout("In registerGUIEvents() : Registering GUI Events.", -1);
   addEvent("click", document.getElementById("terminal_clear_button"), clear_terminal);
   addEvent("click", document.getElementById("local_storage_list_refresh_button"), refreshStorageListing);
+  addEvent("click", document.getElementById("freeze_list_refresh_button"), refreshFreezeListing);
   addEvent("click", document.getElementById("terminal_close_button"), function () { windowStacks[1].hide(); });
   addEvent("click", document.getElementById("about_close_button"), function () { windowStacks[2].hide(); });
   addEvent("click", document.getElementById("settings_close_button"), function () { windowStacks[3].hide(); });
@@ -69,7 +70,7 @@ function registerGUIEvents() {
   addEvent("click", document.getElementById("freeze_list_menu"), function () { refreshFreezeListing(); windowStacks[8].show(); });
   addEvent("click", document.getElementById("view_importer"), function () { windowStacks[9].show(); });
   addEvent("keydown", document, keyDown);
-  addEvent("keyup", document,  function (event) {
+  addEvent("keyup", document, function (event) {
     if (event.keyCode == 27) {
       //Fullscreen on/off
       fullscreenPlayer();
@@ -163,7 +164,6 @@ function registerGUIEvents() {
             catch (error) {
               alert(error.message + " file: " + error.fileName + " line: " + error.lineNumber);
             }
-
           }
         }
         else {
@@ -198,6 +198,7 @@ function registerGUIEvents() {
                   if (typeof fileData === "string" && fileData.substring(0, 13) === "EMULATOR_DATA") {
                     import_save(fileData);
                     refreshStorageListing();
+                    refreshFreezeListing();
                   }
                   else {
                     // Treat as RAW binary save (e.g. .sav). We'll store it as B64_SRAM_<ROM name>.
@@ -258,11 +259,11 @@ function registerGUIEvents() {
             try {
               import_save(romImageString);
               refreshStorageListing();
+              refreshFreezeListing();
             }
             catch (error) {
               alert(error.message + " file: " + error.fileName + " line: " + error.lineNumber);
             }
-
           }
         }
         else {
@@ -589,6 +590,7 @@ function deleteStorageSlot(keyName) {
   deleteValue(keyName);
   windowStacks[6].hide();
   refreshStorageListing();
+  refreshFreezeListing();
 }
 function generateLink(address, textData) {
   var link = document.createElement("a");
@@ -682,10 +684,6 @@ function pageYCoord(event) {
 function mouseLeaveVerify(oElement, event) {
   //Hook target element with onmouseout and use this function to verify onmouseleave.
   return isDescendantOf(oElement, (typeof event.target != "undefined") ? event.target : event.srcElement) && !isDescendantOf(oElement, (typeof event.relatedTarget != "undefined") ? event.relatedTarget : event.toElement);
-}
-function mouseEnterVerify(oElement, event) {
-  //Hook target element with onmouseover and use this function to verify onmouseenter.
-  return !isDescendantOf(oElement, (typeof event.target != "undefined") ? event.target : event.srcElement) && isDescendantOf(oElement, (typeof event.relatedTarget != "undefined") ? event.relatedTarget : event.fromElement);
 }
 function addEvent(sEvent, oElement, fListener) {
   try {
