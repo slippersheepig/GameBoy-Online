@@ -1,5 +1,6 @@
 "use strict";
 var windowStacks = [];
+var topZIndex = 2;
 function windowCreate(sId, bShow) {
   var oWindow = new windowStack(document.getElementById(sId));
   if (bShow) {
@@ -9,7 +10,6 @@ function windowCreate(sId, bShow) {
 }
 function windowStack(element) {
   if (element != null && typeof element == "object") {
-    this.lastOpacity = null;
     this.domObject = element;
     this.hadFocus = true;
     this.hookedMouse = false;
@@ -17,36 +17,54 @@ function windowStack(element) {
     this.events = [
       ["mousedown", function (event) { thisObj2.dragEnable(event); }],
       ["mousemove", function (event) { thisObj2.drag(event); }],
-      ["mouseup", function (event) { thisObj2.dragDisable(); }]
+      ["mouseup", function () { thisObj2.dragDisable(); }]
     ];
   }
 }
+windowStack.prototype.bringToFront = function () {
+  var currentZ = parseInt(this.domObject.style.zIndex, 10) || 0;
+  if (currentZ < topZIndex || !this.hadFocus) {
+    this.domObject.style.zIndex = ++topZIndex;
+  }
+  this.hadFocus = true;
+};
+windowStack.prototype.syncBannerPosition = function () {
+  if (this.domObject.id === "GameBoy") {
+    var banner = document.getElementById("mobile_mode_banner");
+    if (banner) {
+      var gbTop = parseInt(this.domObject.style.top, 10) || 0;
+      var gbLeft = parseInt(this.domObject.style.left, 10) || 0;
+      var bannerHeight = banner.offsetHeight || 58;
+      banner.style.top = Math.max(gbTop - bannerHeight - 14, 10) + "px";
+      banner.style.left = (gbLeft + Math.round(this.domObject.offsetWidth / 2)) + "px";
+    }
+  }
+};
 windowStack.prototype.registerMouseEvents = function () {
   if (!this.hookedMouse) {
     this.hookedMouse = true;
-    var eventIndex = null;
-    for (eventIndex in this.events) {
+    for (var eventIndex = 0; eventIndex < this.events.length; ++eventIndex) {
       addEvent(this.events[eventIndex][0], document, this.events[eventIndex][1]);
     }
     this.center();
   }
-}
+};
 windowStack.prototype.unregisterMouseEvents = function () {
   if (this.hookedMouse) {
     this.hookedMouse = false;
-    var eventIndex = null;
-    for (eventIndex in this.events) {
+    for (var eventIndex = 0; eventIndex < this.events.length; ++eventIndex) {
       removeEvent(this.events[eventIndex][0], document, this.events[eventIndex][1]);
     }
   }
-}
+};
 windowStack.prototype.getStyleFloatOf = function (propertyNameOf, JSpropertyNameOf) {
+  var dirtyValue = null;
   try {
-    var dirtyValue = window.getComputedStyle(this.domObject, null).getPropertyValue(propertyNameOf);
+    dirtyValue = window.getComputedStyle(this.domObject, null).getPropertyValue(propertyNameOf);
   }
   catch (error) {
     try {
-      var dirtyValue = this.domObject.currentStyle.getAttribute(JSpropertyNameOf);  /*JS object notation style keywords, not the CSS keywords!*/
+      dirtyValue = this.domObject.currentStyle.getAttribute(JSpropertyNameOf);  /*JS object notation style keywords, not the CSS keywords!*/
     }
     catch (error) {
       cout(error.message, 2);
@@ -54,7 +72,7 @@ windowStack.prototype.getStyleFloatOf = function (propertyNameOf, JSpropertyName
   }
   var cleanValue = parseFloat((dirtyValue != null && dirtyValue.length) ? dirtyValue : "0");
   return (!isNaN(cleanValue) && cleanValue != -1) ? cleanValue : 0;  /*Note: Opera gives -1, not NaN for cleanValue when no number is found.*/
-}
+};
 windowStack.prototype.dragEnable = function (event) {
   var elementAt = document.elementFromPoint(event.clientX, event.clientY);
   this.leftPos = this.getStyleFloatOf("left", "left");
@@ -67,8 +85,8 @@ windowStack.prototype.dragEnable = function (event) {
     this.movable = true;
     this.leftLast = event.clientX;
     this.topLast = event.clientY;
-    this.domObject.style.zIndex = 2;
-    if (highX - this.leftLast < 25 && highY - this.topLast < 25) {  /*Inivisible resize corner area for windows.*/
+    this.bringToFront();
+    if (highX - this.leftLast < 25 && highY - this.topLast < 25) {  /*Invisible resize corner area for windows.*/
       this.resize = true;
     }
     else {
@@ -82,7 +100,7 @@ windowStack.prototype.dragEnable = function (event) {
   else {
     this.lostFocus();
   }
-}
+};
 windowStack.prototype.drag = function (event) {
   if (this.movable) {
     this.lastLeft += event.clientX - this.coordDiffLeft;
@@ -93,67 +111,54 @@ windowStack.prototype.drag = function (event) {
       if (this.getStyleFloatOf("min-width", "minWidth") <= newWidth && this.getStyleFloatOf("min-height", "minHeight") <= newHeight && ((this.getStyleFloatOf("max-width", "maxWidth") >= newWidth || this.getStyleFloatOf("max-width", "maxWidth") == 0) && (this.getStyleFloatOf("max-height", "maxHeight") >= newHeight || this.getStyleFloatOf("max-height", "maxHeight") == 0))) {
         this.domObject.style.width = newWidth + "px";
         this.domObject.style.height = newHeight + "px";
+        this.syncBannerPosition();
       }
     }
     else if (!this.mousedInsideWindow) {
       this.domObject.style.left = this.lastLeft + "px";
       this.domObject.style.top = this.lastTop + "px";
-      if (this.domObject.id === "GameBoy") {
-        var banner = document.getElementById("mobile_mode_banner");
-        if (banner) {
-          var bannerHeight = banner.offsetHeight || 58;
-          banner.style.top = Math.max(this.lastTop - bannerHeight - 14, 10) + "px";
-          banner.style.left = (this.lastLeft + Math.round(this.domObject.offsetWidth / 2)) + "px";
-        }
-      }
+      this.syncBannerPosition();
     }
     this.coordDiffLeft = this.leftLast = event.clientX;
     this.coordDiffTop = this.topLast = event.clientY;
   }
-}
+};
 windowStack.prototype.dragDisable = function () {
   this.movable = false;
   this.hadFocus = true;
-}
+};
 windowStack.prototype.lostFocus = function () {
   if (this.hadFocus) {
-    this.domObject.style.zIndex = 1;
     this.hadFocus = false;
   }
-}
-windowStack.prototype.interceptOpacity = function () {
-  if (this.lastOpacity != null) {
-    this.lastOpacity.bDoneRun = true;
-    return this.lastOpacity.RefOpacityAREABegin;
-  }
-  var sampledOpacity = this.getStyleFloatOf("opacity", "opacity") * 100;
-  return (sampledOpacity > 0) ? sampledOpacity : 100;  /*Dirty opacity first-set for IE*/
-}
+};
 windowStack.prototype.center = function () {
   var docWidth = Math.max(document.documentElement.clientWidth, document.getElementsByTagName("body")[0].clientWidth);
   var docHeight = Math.max(document.documentElement.clientHeight, document.getElementsByTagName("body")[0].clientHeight);
   var docLeft = Math.max(document.documentElement.scrollLeft, document.getElementsByTagName("body")[0].scrollLeft);
   var docTop = Math.max(document.documentElement.scrollTop, document.getElementsByTagName("body")[0].scrollTop);
   this.domObject.style.left = Math.round(((docWidth - this.domObject.offsetWidth) / 2) + docLeft) + "px";
-  this.domObject.style.top = Math.max(Math.round(((docHeight - this.domObject.offsetHeight) / 2) + docTop), 80) + "px";
   if (this.domObject.id === "GameBoy") {
+    var controls = document.getElementById("gb-virtual-controls");
     var banner = document.getElementById("mobile_mode_banner");
-    if (banner) {
-      var gbTop = parseInt(this.domObject.style.top, 10);
-      var bannerHeight = banner.offsetHeight || 58;
-      banner.style.top = Math.max(gbTop - bannerHeight - 14, 10) + "px";
-      banner.style.left = (parseInt(this.domObject.style.left, 10) + Math.round(this.domObject.offsetWidth / 2)) + "px";
-    }
+    var extraBottom = controls ? ((controls.offsetHeight || 190) + 8) : 0;
+    var extraTop = banner ? ((banner.offsetHeight || 58) + 14) : 0;
+    this.domObject.style.top = Math.max(Math.round(((docHeight - this.domObject.offsetHeight - extraBottom + extraTop) / 2) + docTop), extraTop + 10) + "px";
+    this.syncBannerPosition();
   }
-}
+  else {
+    this.domObject.style.top = Math.max(Math.round(((docHeight - this.domObject.offsetHeight) / 2) + docTop), 40) + "px";
+  }
+};
 windowStack.prototype.hide = function () {
   this.domObject.style.display = "none";
   this.unregisterMouseEvents();
-}
+};
 windowStack.prototype.show = function () {
   this.domObject.style.display = "block";
+  this.bringToFront();
   this.registerMouseEvents();
-}
+};
 function popupMenu(oClick, oMenu) {
   this.clickElement = oClick;
   this.menuElement = oMenu;
@@ -173,7 +178,7 @@ popupMenu.prototype.startPopup = function (event) {
     this.position(event);
     addEvent("mouseout", this.menuElement, this.eventHandle[1]);
   }
-}
+};
 popupMenu.prototype.endPopup = function (event) {
   if (this.open) {
     if (mouseLeaveVerify(this.menuElement, event)) {
@@ -183,10 +188,10 @@ popupMenu.prototype.endPopup = function (event) {
       addEvent("click", this.clickElement, this.eventHandle[0]);
     }
   }
-}
+};
 popupMenu.prototype.position = function (event) {
   if (this.open) {
     this.menuElement.style.left = (pageXCoord(event) - 5) + "px";
     this.menuElement.style.top = (pageYCoord(event) - 5) + "px";
   }
-}
+};
