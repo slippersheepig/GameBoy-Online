@@ -1,5 +1,5 @@
 "use strict";
- /*
+/*
   JavaScript GameBoy Color Emulator
   Copyright (C) 2010-2016 Grant Galitz
 
@@ -6424,7 +6424,6 @@ GameBoyCore.prototype.initializeReferencesFromSaveState = function () {
       this.OBJPalette = this.gbOBJColorizedPalette;
       this.updateGBBGPalette = this.updateGBColorizedBGPalette;
       this.updateGBOBJPalette = this.updateGBColorizedOBJPalette;
-
     }
     else {
       this.BGPalette = this.gbBGPalette;
@@ -7587,7 +7586,6 @@ GameBoyCore.prototype.memoryReadJumpCompile = function () {
             parentObj.memory[0xFF04] = (parentObj.memory[0xFF04] + (parentObj.DIVTicks >> 8)) & 0xFF;
             parentObj.DIVTicks &= 0xFF;
             return parentObj.memory[0xFF04];
-
           }
           break;
         case 0xFF05:
@@ -7904,20 +7902,20 @@ GameBoyCore.prototype.memoryReadJumpCompile = function () {
             return 0x8F | parentObj.memory[0xFF75];
           }
           break;
-                case 0xFF76:
-                    //Undocumented realtime PCM amplitude readback:
-                    this.memoryHighReader[0x76] = this.memoryReader[0xFF76] = function (parentObj, address) {
-                        parentObj.audioJIT();
-                        return (parentObj.channel2envelopeVolume << 4) | parentObj.channel1envelopeVolume;
-                    }
-                    break;
-                case 0xFF77:
-                    //Undocumented realtime PCM amplitude readback:
-                    this.memoryHighReader[0x77] = this.memoryReader[0xFF77] = function (parentObj, address) {
-                        parentObj.audioJIT();
-                        return (parentObj.channel4envelopeVolume << 4) | parentObj.channel3envelopeVolume;
-                    }
-                    break;
+        case 0xFF76:
+          //Undocumented realtime PCM amplitude readback:
+          this.memoryHighReader[0x76] = this.memoryReader[0xFF76] = function (parentObj, address) {
+            parentObj.audioJIT();
+            return (parentObj.channel2envelopeVolume << 4) | parentObj.channel1envelopeVolume;
+          }
+          break;
+        case 0xFF77:
+          //Undocumented realtime PCM amplitude readback:
+          this.memoryHighReader[0x77] = this.memoryReader[0xFF77] = function (parentObj, address) {
+            parentObj.audioJIT();
+            return (parentObj.channel4envelopeVolume << 4) | parentObj.channel3envelopeVolume;
+          }
+          break;
         case 0xFF78:
         case 0xFF79:
         case 0xFF7A:
