@@ -12,20 +12,20 @@ function XAudioServer(channels, sampleRate, minBufferSize, maxBufferSize, underR
   this.initializeAudio();
 }
 XAudioServer.prototype.MOZWriteAudioNoCallback = function (buffer) {
-    //Resample before passing to the moz audio api:
-    var bufferLength  = buffer.length;
-    for (var bufferIndex = 0; bufferIndex < bufferLength;) {
-        var sliceLength = Math.min(bufferLength - bufferIndex, XAudioJSMaxBufferSize);
-        for (var sliceIndex = 0; sliceIndex < sliceLength; ++sliceIndex) {
-            XAudioJSAudioContextSampleBuffer[sliceIndex] = buffer[bufferIndex++];
-        }
-        var resampleLength = XAudioJSResampleControl.resampler(XAudioJSGetArraySlice(XAudioJSAudioContextSampleBuffer, sliceIndex));
-        if (resampleLength > 0) {
-            var resampledResult = XAudioJSResampleControl.outputBuffer;
-            var resampledBuffer = XAudioJSGetArraySlice(resampledResult, resampleLength);
-            this.samplesAlreadyWritten += this.audioHandleMoz.mozWriteAudio(resampledBuffer);
-        }
+  //Resample before passing to the moz audio api:
+  var bufferLength = buffer.length;
+  for (var bufferIndex = 0; bufferIndex < bufferLength;) {
+    var sliceLength = Math.min(bufferLength - bufferIndex, XAudioJSMaxBufferSize);
+    for (var sliceIndex = 0; sliceIndex < sliceLength; ++sliceIndex) {
+      XAudioJSAudioContextSampleBuffer[sliceIndex] = buffer[bufferIndex++];
     }
+    var resampleLength = XAudioJSResampleControl.resampler(XAudioJSGetArraySlice(XAudioJSAudioContextSampleBuffer, sliceIndex));
+    if (resampleLength > 0) {
+      var resampledResult = XAudioJSResampleControl.outputBuffer;
+      var resampledBuffer = XAudioJSGetArraySlice(resampledResult, resampleLength);
+      this.samplesAlreadyWritten += this.audioHandleMoz.mozWriteAudio(resampledBuffer);
+    }
+  }
 }
 XAudioServer.prototype.callbackBasedWriteAudioNoCallback = function (buffer) {
   //Callback-centered audio APIs:
@@ -129,28 +129,28 @@ XAudioServer.prototype.executeCallback = function () {
 }
 //DO NOT CALL THIS, the lib calls this internally!
 XAudioServer.prototype.initializeAudio = function () {
+  try {
+    this.initializeWebAudio();
+  }
+  catch (error) {
     try {
-        this.initializeWebAudio();
+      this.initializeMozAudio();
     }
     catch (error) {
+      try {
+        this.initializeMediaStream();
+      }
+      catch (error) {
         try {
-            this.initializeMozAudio();
+          this.initializeFlashAudio();
         }
         catch (error) {
-            try {
-                this.initializeMediaStream();
-            }
-            catch (error) {
-                try {
-                    this.initializeFlashAudio();
-                }
-                catch (error) {
-                    this.audioType = -1;
-                    this.failureCallback();
-                }
-            }
+          this.audioType = -1;
+          this.failureCallback();
         }
+      }
     }
+  }
 }
 XAudioServer.prototype.initializeMediaStream = function () {
   this.audioHandleMediaStream = new Audio();
@@ -182,72 +182,69 @@ XAudioServer.prototype.initializeMozAudio = function () {
 }
 XAudioServer.prototype.initializeWebAudio = function () {
   if (!XAudioJSWebAudioLaunchedContext || !XAudioJSWebAudioContextHandle) {
-        try {
-            var AudioContextClass = window.AudioContext || window.webkitAudioContext;
-            if (AudioContextClass) {
-                XAudioJSWebAudioContextHandle = new AudioContextClass();
-            }
-        }
-        catch (error) {
-        }
-        XAudioJSWebAudioLaunchedContext = true;
-    }
-    if (!XAudioJSWebAudioContextHandle) {
-        throw new Error("AudioContext is not supported.");
-    }
-    // Set up auto-resume on first user gesture if context is suspended by autoplay policy
-    var resumeContext = function () {
-        if (XAudioJSWebAudioContextHandle && XAudioJSWebAudioContextHandle.state === "suspended") {
-            XAudioJSWebAudioContextHandle.resume().then(function () {
-                if (typeof window.onXAudioResumed === "function") {
-                    window.onXAudioResumed();
-                }
-            }).catch(function () {});
-        }
-    };
-    if (typeof window !== "undefined") {
-        ["click", "touchstart", "touchend", "mousedown", "keydown"].forEach(function (evt) {
-            window.addEventListener(evt, resumeContext, { passive: true });
-        });
-    }
-    if (XAudioJSWebAudioAudioNode) {
-        try {
-            XAudioJSWebAudioAudioNode.disconnect();
-        } catch (e) {}
-        XAudioJSWebAudioAudioNode.onaudioprocess = null;
-        XAudioJSWebAudioAudioNode = null;
-    }
     try {
-        XAudioJSWebAudioAudioNode = XAudioJSWebAudioContextHandle.createScriptProcessor(XAudioJSSamplesPerCallback, 0, XAudioJSChannelsAllocated);  //Create the js event node.
+      var AudioContextClass = window.AudioContext || window.webkitAudioContext;
+      if (AudioContextClass) {
+        XAudioJSWebAudioContextHandle = new AudioContextClass();
+      }
     }
     catch (error) {
-        XAudioJSWebAudioAudioNode = XAudioJSWebAudioContextHandle.createJavaScriptNode(XAudioJSSamplesPerCallback, 0, XAudioJSChannelsAllocated);  //Create the js event node.
     }
-    XAudioJSWebAudioAudioNode.onaudioprocess = XAudioJSWebAudioEvent;                                      //Connect the audio processing event to a handling function so we can manipulate output
-    XAudioJSWebAudioAudioNode.connect(XAudioJSWebAudioContextHandle.destination);                                //Send and chain the output of the audio manipulation to the system audio output.
-    this.resetCallbackAPIAudioBuffer(XAudioJSWebAudioContextHandle.sampleRate);
-    this.audioType = 1;
-    /*
-     Firefox has a bug in its web audio implementation...
-     The node may randomly stop playing on Mac OS X for no
-     good reason. Keep a watchdog timer to restart the failed
-     node if it glitches. Google Chrome never had this issue.
-     */
-    XAudioJSWebAudioWatchDogLast = (new Date()).getTime();
-    if (navigator.userAgent.indexOf('Gecko/') > -1) {
-        if (XAudioJSWebAudioWatchDogTimer) {
-            clearInterval(XAudioJSWebAudioWatchDogTimer);
+    XAudioJSWebAudioLaunchedContext = true;
+  }
+  if (!XAudioJSWebAudioContextHandle) {
+    throw new Error("AudioContext is not supported.");
+  }
+  // Set up auto-resume on first user gesture if context is suspended by autoplay policy
+  if (!XAudioJSWebAudioGestureHooked && typeof window !== "undefined") {
+    XAudioJSWebAudioGestureHooked = true;
+    var resumeContext = function () {
+      if (XAudioJSWebAudioContextHandle && XAudioJSWebAudioContextHandle.state === "suspended") {
+        XAudioJSWebAudioContextHandle.resume().catch(function () {});
+      }
+    };
+    ["click", "touchstart", "touchend", "mousedown", "keydown"].forEach(function (evt) {
+      window.addEventListener(evt, resumeContext, { passive: true });
+    });
+  }
+  if (XAudioJSWebAudioAudioNode) {
+    try {
+      XAudioJSWebAudioAudioNode.disconnect();
+    } catch (e) {}
+    XAudioJSWebAudioAudioNode.onaudioprocess = null;
+    XAudioJSWebAudioAudioNode = null;
+  }
+  try {
+    XAudioJSWebAudioAudioNode = XAudioJSWebAudioContextHandle.createScriptProcessor(XAudioJSSamplesPerCallback, 0, XAudioJSChannelsAllocated);  //Create the js event node.
+  }
+  catch (error) {
+    XAudioJSWebAudioAudioNode = XAudioJSWebAudioContextHandle.createJavaScriptNode(XAudioJSSamplesPerCallback, 0, XAudioJSChannelsAllocated);  //Create the js event node.
+  }
+  XAudioJSWebAudioAudioNode.onaudioprocess = XAudioJSWebAudioEvent;                                      //Connect the audio processing event to a handling function so we can manipulate output
+  XAudioJSWebAudioAudioNode.connect(XAudioJSWebAudioContextHandle.destination);                                //Send and chain the output of the audio manipulation to the system audio output.
+  this.resetCallbackAPIAudioBuffer(XAudioJSWebAudioContextHandle.sampleRate);
+  this.audioType = 1;
+  /*
+    Firefox has a bug in its web audio implementation...
+    The node may randomly stop playing on Mac OS X for no
+    good reason. Keep a watchdog timer to restart the failed
+    node if it glitches. Google Chrome never had this issue.
+  */
+  XAudioJSWebAudioWatchDogLast = (new Date()).getTime();
+  if (navigator.userAgent.indexOf('Gecko/') > -1) {
+    if (XAudioJSWebAudioWatchDogTimer) {
+      clearInterval(XAudioJSWebAudioWatchDogTimer);
+    }
+    var parentObj = this;
+    XAudioJSWebAudioWatchDogTimer = setInterval(function () {
+      if (XAudioJSWebAudioContextHandle && XAudioJSWebAudioContextHandle.state === "running") {
+        var timeDiff = (new Date()).getTime() - XAudioJSWebAudioWatchDogLast;
+        if (timeDiff > 500) {
+          parentObj.initializeWebAudio();
         }
-        var parentObj = this;
-        XAudioJSWebAudioWatchDogTimer = setInterval(function () {
-            if (XAudioJSWebAudioContextHandle && XAudioJSWebAudioContextHandle.state === "running") {
-                var timeDiff = (new Date()).getTime() - XAudioJSWebAudioWatchDogLast;
-                if (timeDiff > 500) {
-                    parentObj.initializeWebAudio();
-                }
-            }
-        }, 500);
-    }
+      }
+    }, 500);
+  }
 }
 XAudioServer.prototype.initializeFlashAudio = function () {
   var existingFlashload = document.getElementById("XAudioJS");
@@ -342,12 +339,12 @@ XAudioServer.prototype.checkFlashInit = function () {
 //Set up the resampling:
 XAudioServer.prototype.resetCallbackAPIAudioBuffer = function (APISampleRate) {
   XAudioJSAudioBufferSize = XAudioJSResampleBufferEnd = XAudioJSResampleBufferStart = 0;
-    this.initializeResampler(APISampleRate);
-    XAudioJSResampledBuffer = this.getFloat32(XAudioJSResampleBufferSize);
+  this.initializeResampler(APISampleRate);
+  XAudioJSResampledBuffer = this.getFloat32(XAudioJSResampleBufferSize);
 }
 XAudioServer.prototype.initializeResampler = function (sampleRate) {
-    XAudioJSAudioContextSampleBuffer = this.getFloat32(XAudioJSMaxBufferSize);
-    XAudioJSResampleBufferSize = Math.max(XAudioJSMaxBufferSize * Math.ceil(sampleRate / this.XAudioJSSampleRate) + XAudioJSChannelsAllocated, XAudioJSSamplesPerCallback * XAudioJSChannelsAllocated);
+  XAudioJSAudioContextSampleBuffer = this.getFloat32(XAudioJSMaxBufferSize);
+  XAudioJSResampleBufferSize = Math.max(XAudioJSMaxBufferSize * Math.ceil(sampleRate / this.XAudioJSSampleRate) + XAudioJSChannelsAllocated, XAudioJSSamplesPerCallback * XAudioJSChannelsAllocated);
   XAudioJSResampleControl = new Resampler(this.XAudioJSSampleRate, sampleRate, XAudioJSChannelsAllocated, XAudioJSResampleBufferSize, true);
 }
 XAudioServer.prototype.getFloat32 = function (size) {
@@ -413,6 +410,7 @@ var XAudioJSWebAudioAudioNode = null;
 var XAudioJSWebAudioWatchDogTimer = null;
 var XAudioJSWebAudioWatchDogLast = false;
 var XAudioJSWebAudioLaunchedContext = false;
+var XAudioJSWebAudioGestureHooked = false;
 var XAudioJSAudioContextSampleBuffer = [];
 var XAudioJSResampledBuffer = [];
 var XAudioJSMinBufferSize = 15000;
@@ -508,7 +506,7 @@ function XAudioJSResampledSamplesLeft() {
   return ((XAudioJSResampleBufferStart <= XAudioJSResampleBufferEnd) ? 0 : XAudioJSResampleBufferSize) + XAudioJSResampleBufferEnd - XAudioJSResampleBufferStart;
 }
 function XAudioJSGetBufferSamples() {
-    return XAudioJSGetArraySlice(XAudioJSAudioContextSampleBuffer, XAudioJSAudioBufferSize);
+  return XAudioJSGetArraySlice(XAudioJSAudioContextSampleBuffer, XAudioJSAudioBufferSize);
 }
 function XAudioJSGetArraySlice(buffer, lengthOf) {
   //Typed array and normal array buffer section referencing:
@@ -526,14 +524,4 @@ function XAudioJSGetArraySlice(buffer, lengthOf) {
       return buffer.slice(0, lengthOf);
     }
   }
-}
-if (typeof window !== "undefined") {
-  window.XAudioJSResumeContext = function () {
-    if (typeof XAudioJSWebAudioContextHandle !== "undefined" && XAudioJSWebAudioContextHandle) {
-      if (XAudioJSWebAudioContextHandle.state === "suspended") {
-        return XAudioJSWebAudioContextHandle.resume();
-      }
-    }
-    return Promise.resolve();
-  };
 }
