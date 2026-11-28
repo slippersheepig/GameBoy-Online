@@ -8,6 +8,8 @@ on:
 jobs:
   check-update:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - name: Checkout repository
         uses: actions/checkout@v7
@@ -15,9 +17,13 @@ jobs:
       - name: Get latest update timestamp
         id: check
         run: |
-          LAST_UPDATED=$(curl -s https://hub.docker.com/v2/repositories/library/nginx/tags/alpine-slim \
-            | jq -r '.last_updated')
-          echo "last_updated=$LAST_UPDATED" >> $GITHUB_OUTPUT
+          LAST_UPDATED=$(curl -fsSL https://hub.docker.com/v2/repositories/library/nginx/tags/alpine-slim \
+            | jq -r '.last_updated // empty')
+          if [ -z "$LAST_UPDATED" ] || [ "$LAST_UPDATED" = "null" ]; then
+            echo "Failed to fetch valid last_updated timestamp from Docker Hub." >&2
+            exit 1
+          fi
+          echo "last_updated=$LAST_UPDATED" >> "$GITHUB_OUTPUT"
           echo "Docker Hub last_updated: $LAST_UPDATED"
 
       - name: Compare with stored timestamp
