@@ -48,16 +48,17 @@ div.window {
   position: absolute;
   overflow: hidden;
   margin: 0;
-  padding: 10px 0px 0px 0px;
+  padding: 10px 0 0 0;
   top: 0;
   left: 0;
-  color: rgb(0, 0, 0);
-  font-size: 16px;
-  -webkit-border-radius: 10px 10px 3px 3px;
-  border-radius: 10px 10px 3px 3px;
-  -webkit-box-shadow: 5px 5px 10px rgb(30, 30, 30);
-  box-shadow: 5px 5px 10px rgb(30, 30, 30);
-  background-color: rgb(200, 200, 200);
+  color: #1f2937;
+  font-size: 14px;
+  border: 1px solid rgba(0, 0, 0, 0.25);
+  -webkit-border-radius: 10px;
+  border-radius: 10px;
+  -webkit-box-shadow: 0 14px 34px rgba(0, 0, 0, 0.28), 0 2px 8px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.28), 0 2px 8px rgba(0, 0, 0, 0.12);
+  background-color: #e4e7ec;
   z-index: 2;
   opacity: 1;
 }
@@ -69,14 +70,40 @@ div#GameBoy {
 
 div#input_select,
 div#save_importer {
-  min-height: 110px;
-  min-width: 260px;
+  min-height: 118px;
+  min-width: 280px;
 }
 
 div#input_select>form,
 div#save_importer>form {
-  padding: 12px 14px;
+  padding: 14px 16px 8px 16px;
   margin: 0;
+}
+
+div#input_select input[type="file"],
+div#save_importer input[type="file"] {
+  display: block;
+  width: 100%;
+  font-size: 13px;
+  color: #374151;
+  background: #f8fafc;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  padding: 6px 8px;
+  box-sizing: border-box;
+}
+
+div#input_select input[type="file"]::file-selector-button,
+div#save_importer input[type="file"]::file-selector-button {
+  margin-right: 10px;
+  padding: 4px 10px;
+  border: 1px solid #94a3b8;
+  border-radius: 4px;
+  background: linear-gradient(180deg, #ffffff 0%, #e2e8f0 100%);
+  color: #1e293b;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
 }
 
 div#instructions {
@@ -85,33 +112,33 @@ div#instructions {
 }
 
 div.menubar {
-  max-height: 28px;
-  min-width: 250px;
-  display: block;
+  height: 30px;
+  min-width: 240px;
+  display: flex;
+  align-items: center;
+  gap: 2px;
   overflow: hidden;
   position: absolute;
+  top: 10px;
   left: 0;
   right: 0;
-  border-top-style: solid;
-  border-top-width: 1px;
-  border-top-color: rgb(150, 150, 150);
-  border-left-style: none;
-  border-right-style: none;
-  border-bottom-style: solid;
-  border-bottom-width: 1px;
-  border-bottom-color: rgb(50, 50, 50);
+  border-top: 1px solid rgb(165, 165, 165);
+  border-left: none;
+  border-right: none;
+  border-bottom: 1px solid rgb(120, 120, 120);
   text-overflow: ellipsis;
   margin: 0;
-  padding: 0 0 0 3px;
+  padding: 0 6px;
   text-align: left;
+  box-sizing: border-box;
   background-color: rgb(210, 210, 210);
   background-repeat: repeat-x;
   background-attachment: scroll;
   background-image: url("../images/gradient_02.svg");
-  background-image: -webkit-linear-gradient(top, rgb(150, 150, 150), rgb(220, 220, 220), rgb(180, 180, 180));
-  background-image: -moz-linear-gradient(top, rgb(150, 150, 150), rgb(220, 220, 220), rgb(180, 180, 180));
-  background-image: -o-linear-gradient(top, rgb(150, 150, 150), rgb(220, 220, 220), rgb(180, 180, 180));
-  background-image: linear-gradient(to bottom, rgb(150, 150, 150), rgb(220, 220, 220), rgb(180, 180, 180));
+  background-image: -webkit-linear-gradient(top, rgb(232, 234, 238), rgb(208, 212, 218));
+  background-image: -moz-linear-gradient(top, rgb(232, 234, 238), rgb(208, 212, 218));
+  background-image: -o-linear-gradient(top, rgb(232, 234, 238), rgb(208, 212, 218));
+  background-image: linear-gradient(to bottom, rgb(232, 234, 238), rgb(208, 212, 218));
 }
 
 div.menubar>span {
@@ -119,35 +146,23 @@ div.menubar>span {
   -webkit-border-radius: 5px;
   border-radius: 5px;
   background-color: transparent;
-  padding: 2px 5px;
-  margin: 3px 3px 3px 0;
-  display: inline-block;
+  padding: 3px 8px;
+  margin: 0;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 18px;
+  color: #1f2937;
+  display: inline-flex;
+  align-items: center;
+  transition: background-color 0.15s ease;
 }
 
 div.menubar>span:hover {
-  -webkit-box-shadow: 2px 2px 1px rgb(30, 30, 30);
-  box-shadow: 2px 2px 1px rgb(30, 30, 30);
-  background-color: rgb(160, 160, 160);
-  background-repeat: repeat-x;
-  background-attachment: scroll;
-  background-image: url("../images/gradient_03.svg");
-  background-image: -webkit-linear-gradient(top, rgb(160, 160, 160), rgb(190, 190, 190), rgb(160, 160, 160));
-  background-image: -moz-linear-gradient(top, rgb(160, 160, 160), rgb(190, 190, 190), rgb(160, 160, 160));
-  background-image: -o-linear-gradient(top, rgb(160, 160, 160), rgb(190, 190, 190), rgb(160, 160, 160));
-  background-image: linear-gradient(to bottom, rgb(160, 160, 160), rgb(190, 190, 190), rgb(160, 160, 160));
+  background-color: rgba(0, 0, 0, 0.08);
 }
 
 div.menubar>span:active {
-  -webkit-box-shadow: inset 2px 2px 1px rgb(30, 30, 30);
-  box-shadow: inset 2px 2px 1px rgb(30, 30, 30);
-  background-color: rgb(220, 220, 220);
-  background-repeat: repeat-x;
-  background-attachment: scroll;
-  background-image: url("../images/gradient_04.svg");
-  background-image: -webkit-linear-gradient(top, rgb(190, 190, 190), rgb(160, 160, 160), rgb(190, 190, 190));
-  background-image: -moz-linear-gradient(top, rgb(190, 190, 190), rgb(160, 160, 160), rgb(190, 190, 190));
-  background-image: -o-linear-gradient(top, rgb(190, 190, 190), rgb(160, 160, 160), rgb(190, 190, 190));
-  background-image: linear-gradient(to bottom, rgb(190, 190, 190), rgb(160, 160, 160), rgb(190, 190, 190));
+  background-color: rgba(0, 0, 0, 0.15);
 }
 
 div#gfx {
@@ -156,10 +171,12 @@ div#gfx {
   margin: 0;
   padding: 0;
   position: absolute;
-  bottom: 3px;
-  left: 3px;
-  right: 3px;
-  top: 43px;
+  bottom: 4px;
+  left: 4px;
+  right: 4px;
+  top: 42px;
+  border-radius: 0 0 6px 6px;
+  overflow: hidden;
   background-color: rgb(200, 50, 50);
   background-repeat: repeat-x;
   background-attachment: scroll;
@@ -216,27 +233,32 @@ div#GameBoy>div#gfx>canvas {
 
 div#GameBoy>div#gfx>span#title {
   position: absolute;
-  top: 30%;
-  left: 15%;
-  font-size: 64px;
-  color: rgb(220, 220, 150);
-  text-shadow: 3px 3px 5px rgb(50, 50, 50);
+  top: 29%;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-size: 56px;
+  font-weight: 700;
+  color: rgb(235, 232, 165);
+  text-shadow: 3px 3px 6px rgba(35, 20, 20, 0.65);
   font-style: italic;
   z-index: 1;
-  padding: 0 5px 0 0;
+  padding: 0;
 }
 
 div#GameBoy>div#gfx>span#port_title {
   position: absolute;
-  top: 45%;
-  left: 55%;
-  font-size: 32px;
-  color: rgb(255, 235, 190);
-  text-shadow: 2px 2px 4px rgb(50, 30, 30);
+  top: 52%;
+  left: 0;
+  right: 0;
+  text-align: center;
+  padding-left: 118px;
+  font-size: 28px;
+  color: rgb(255, 240, 200);
+  text-shadow: 2px 2px 5px rgba(40, 20, 20, 0.7);
   font-style: italic;
   font-weight: bold;
   z-index: 2;
-  padding: 0 5px 0 0;
 }
 
 div#about {
@@ -277,73 +299,111 @@ div#freeze_listing {
 
 div.storageList {
   position: absolute;
-  top: 10px;
-  left: 3px;
-  right: 4px;
+  top: 12px;
+  left: 10px;
+  right: 10px;
   overflow: auto;
   text-align: left;
-  bottom: 50px;
-  background-color: rgb(96, 96, 96);
-  -webkit-border-radius: 3px;
-  border-radius: 3px;
-  -webkit-box-shadow: inset 3px 3px 2px 1px rgb(68, 68, 68);
-  box-shadow: inset 3px 3px 2px 1px rgb(68, 68, 68);
-  padding: 6px;
+  bottom: 48px;
+  background-color: #f8fafc;
+  border: 1px solid #cbd5e1;
+  -webkit-border-radius: 6px;
+  border-radius: 6px;
+  padding: 8px 10px;
+  color: #1e293b;
 }
 
 div#storageListingMasterContainer {
-  top: 40px !important;
+  top: 46px !important;
 }
 
 div#download_all_storage {
   position: absolute;
-  height: 20px;
-  left: 3px;
-  top: 10px;
-  right: 4px;
+  height: 26px;
+  line-height: 26px;
+  left: 10px;
+  top: 12px;
+  right: 10px;
   text-align: center;
-  font-weight: bold;
-  background-color: rgb(96, 96, 96);
-  -webkit-border-radius: 3px;
-  border-radius: 3px;
-  -webkit-box-shadow: inset 3px 3px 2px 1px rgb(68, 68, 68);
-  box-shadow: inset 3px 3px 2px 1px rgb(68, 68, 68);
-  padding: 3px;
+  font-size: 13px;
+  font-weight: 600;
+  background-color: #eff6ff;
+  border: 1px solid #bfdbfe;
+  -webkit-border-radius: 6px;
+  border-radius: 6px;
+  padding: 0 8px;
+  box-sizing: border-box;
+}
+
+div.storageListingContainer {
+  padding: 5px 6px;
+  border-bottom: 1px solid #e2e8f0;
+  font-size: 13px;
+}
+
+div.storageListingContainer:last-child {
+  border-bottom: none;
 }
 
 div.storageList a,
 div#download_all_storage a {
-  color: #ffffff;
+  color: #1d4ed8;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+div.storageList a:hover,
+div#download_all_storage a:hover {
+  color: #1e40af;
   text-decoration: underline;
 }
 
+div#storagePopupMasterContainer div {
+  margin-bottom: 8px;
+}
+
+a#storagePopupDelete {
+  display: inline-block;
+  margin-top: 4px;
+  color: #dc2626;
+}
+
+a#storagePopupDelete:hover {
+  color: #b91c1c;
+}
+
 div#terminal>div#terminal_output {
-  background-color: rgb(0, 0, 0);
+  background-color: #0f172a;
+  color: #e2e8f0;
   margin: 0;
   font-family: "Courier New", Consolas, Monaco, monospace;
   font-size: 12px;
-  bottom: 50px;
-  padding: 10px;
-  top: 10px;
-  right: 3px;
-  left: 3px;
+  line-height: 1.5;
+  bottom: 48px;
+  padding: 10px 12px;
+  top: 12px;
+  right: 10px;
+  left: 10px;
+  border-radius: 6px;
+  border: 1px solid #334155;
   position: absolute;
-  cursor: crosshair;
+  cursor: text;
   overflow: auto;
   text-align: left;
 }
 
 div#terminal>div#terminal_output>span.white {
-  color: rgb(255, 255, 255);
+  color: #f1f5f9;
 }
 
 div#terminal>div#terminal_output>span.white:before {
   content: "<DEBUG> ";
   font-weight: bold;
+  color: #94a3b8;
 }
 
 div#terminal>div#terminal_output>span.yellow {
-  color: rgb(255, 255, 0);
+  color: #facc15;
 }
 
 div#terminal>div#terminal_output>span.yellow:before {
@@ -352,7 +412,7 @@ div#terminal>div#terminal_output>span.yellow:before {
 }
 
 div#terminal>div#terminal_output>span.red {
-  color: #ff5252;
+  color: #f87171;
 }
 
 div#terminal>div#terminal_output>span.red:before {
@@ -363,173 +423,218 @@ div#terminal>div#terminal_output>span.red:before {
 div#about>div#about_message,
 div#instructions>div#keycodes {
   position: absolute;
-  top: 10px;
-  left: 3px;
-  bottom: 50px;
-  right: 3px;
-  background-color: rgb(230, 230, 230);
-  border-width: 5px;
-  border-style: groove;
-  border-color: rgb(50, 50, 50);
-  padding: 5px;
+  top: 12px;
+  left: 10px;
+  bottom: 48px;
+  right: 10px;
+  background-color: #f8fafc;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  padding: 12px 14px;
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: #1f2937;
   overflow: auto;
+  box-sizing: border-box;
 }
 
-div#about>div#about_message>h1 {
-  font-size: 20px;
-  color: rgb(80, 60, 20);
+div#about>div#about_message>h1,
+div#instructions>div#keycodes>h1 {
+  margin: 0 0 10px 0;
+  font-size: 17px;
+  color: #111827;
+}
+
+div#about>div#about_message>p {
+  margin: 0 0 8px 0;
+}
+
+div#about>div#about_message a {
+  color: #1d4ed8;
+  word-break: break-all;
+}
+
+div#instructions>div#keycodes>ul {
+  margin: 0;
+  padding-left: 18px;
+}
+
+div#instructions>div#keycodes>ul>li {
+  margin-bottom: 4px;
 }
 
 div#settings>div#toggle_settings {
   position: absolute;
-  top: 10px;
-  left: 3px;
-  right: 3px;
-  bottom: 50px;
+  top: 12px;
+  left: 10px;
+  right: 10px;
+  bottom: 48px;
+  background-color: #f8fafc;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  padding: 4px 0;
   overflow-y: auto;
+  box-sizing: border-box;
 }
 
-div#settings>div#toggle_settings>div.setting {
+div#settings>div#toggle_settings>.setting {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
   text-align: left;
   width: 100%;
   position: relative;
   margin: 0;
-  padding: 3px 8px;
-  border-bottom: 1px dashed transparent;
+  padding: 6px 12px;
+  font-size: 13px;
+  color: #1f2937;
+  border-bottom: 1px solid #eef2f6;
   box-sizing: border-box;
+  cursor: pointer;
 }
 
-div#settings>div#toggle_settings>div.setting:hover {
-  border-bottom-color: rgb(70, 70, 70);
-  background-color: rgba(255, 255, 255, 0.25);
+div#settings>div#toggle_settings>.setting:last-child {
+  border-bottom: none;
 }
 
-div#settings>div#toggle_settings>div.setting input {
-  float: right;
+div#settings>div#toggle_settings>.setting:hover {
+  background-color: #eff6ff;
+}
+
+div#settings>div#toggle_settings>.setting input[type="checkbox"] {
+  margin: 0;
+  width: 15px;
+  height: 15px;
+  accent-color: #2563eb;
+  cursor: pointer;
+  flex-shrink: 0;
 }
 
 div.window>div.button_rack {
   background-color: transparent;
   margin: 0;
-  padding: 0;
+  padding: 0 10px;
   position: absolute;
-  height: 38px;
-  bottom: 6px;
-  right: 6px;
-  left: 6px;
-  text-align: center;
+  height: 34px;
+  bottom: 7px;
+  right: 0;
+  left: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  box-sizing: border-box;
 }
 
 div.window>div.button_rack>button {
   cursor: pointer;
-  padding: 0 18px;
+  padding: 0 14px;
   margin: 0;
-  height: 32px;
-  line-height: 30px;
-  min-width: 110px;
+  height: 30px;
+  line-height: 28px;
+  min-width: 92px;
   width: auto;
   text-align: center;
   font-size: 13px;
+  font-weight: 500;
   position: relative;
-  border: 1px solid #8c8c8c;
-  border-radius: 4px;
-  background: linear-gradient(180deg, #f8f8f8 0%, #dbdbdb 100%);
-  color: #222;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.18);
+  border: 1px solid #9ca3af;
+  border-radius: 6px;
+  background: linear-gradient(180deg, #ffffff 0%, #e5e7eb 100%);
+  color: #1f2937;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
   box-sizing: border-box;
-  transition: background 0.15s, border-color 0.15s;
+  transition: background 0.15s, border-color 0.15s, box-shadow 0.15s;
 }
 
 div.window>div.button_rack>button:hover {
-  background: linear-gradient(180deg, #ffffff 0%, #e5e5e5 100%);
-  border-color: #666;
+  background: linear-gradient(180deg, #ffffff 0%, #f3f4f6 100%);
+  border-color: #6b7280;
 }
 
 div.window>div.button_rack>button:active {
-  background: linear-gradient(180deg, #d0d0d0 0%, #bebebe 100%);
-  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.25);
+  background: linear-gradient(180deg, #e5e7eb 0%, #d1d5db 100%);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.18);
 }
 
 div.window>div.button_rack>button.left {
-  float: left;
-  margin-left: 6px;
+  margin-right: auto;
 }
 
 div.window>div.button_rack>button.right {
-  float: right;
-  margin-right: 6px;
+  margin-left: auto;
 }
 
 div.window>div.button_rack>button.center {
   margin: 0 auto;
-  display: inline-block;
-  float: none;
 }
 
 ul.menu {
-  list-style-position: inside;
+  list-style-type: none;
   position: absolute;
   display: none;
-  list-style-type: none;
   width: auto;
+  min-width: 164px;
   height: auto;
   margin: 0;
-  padding: 0;
+  padding: 4px;
   top: 0;
   left: 0;
   z-index: 1000;
-  background-color: rgb(200, 200, 200);
-  background-repeat: repeat-x;
-  background-attachment: scroll;
-  background-image: url("../images/gradient_06.svg");
-  background-image: -webkit-linear-gradient(left, rgb(200, 200, 200), rgb(240, 240, 240));
-  background-image: -moz-linear-gradient(left, rgb(200, 200, 200), rgb(240, 240, 240));
-  background-image: -o-linear-gradient(left, rgb(200, 200, 200), rgb(240, 240, 240));
-  background-image: linear-gradient(to right, rgb(200, 200, 200), rgb(240, 240, 240));
-  -webkit-border-radius: 3px;
-  border-radius: 3px;
-  -webkit-box-shadow: 5px 5px 10px rgb(30, 30, 30);
-  box-shadow: 5px 5px 10px rgb(30, 30, 30);
-  border-style: solid;
-  border-top-width: 1px;
-  border-left-width: 1px;
-  border-right-width: 2px;
-  border-bottom-width: 2px;
-  border-top-color: rgb(100, 100, 100);
-  border-left-color: rgb(100, 100, 100);
-  border-bottom-color: rgb(50, 50, 50);
-  border-right-color: rgb(50, 50, 50);
+  background-color: rgba(250, 251, 252, 0.98);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  -webkit-border-radius: 8px;
+  border-radius: 8px;
+  -webkit-box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2), 0 2px 6px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2), 0 2px 6px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(0, 0, 0, 0.16);
   overflow: visible;
-}
-
-ul.menu:hover {
-  display: inline-block;
-  top: 0;
-  left: 0;
+  box-sizing: border-box;
 }
 
 ul.menu>li {
-  display: block;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   position: relative;
-  margin: 0 0 -1px 0;
-  padding: 2px 5px 2px 15px;
-  color: rgb(0, 0, 0);
+  margin: 0;
+  padding: 6px 12px;
+  color: #1f2937;
+  font-size: 13px;
   background-color: transparent;
-  width: 200px;
+  min-width: 156px;
   height: auto;
   border: none;
+  border-radius: 5px;
+  cursor: pointer;
   overflow: visible;
-  text-overflow: ellipsis;
+  white-space: nowrap;
+  box-sizing: border-box;
+}
+
+ul.menu>li.has-submenu::after {
+  content: "▸";
+  font-size: 12px;
+  color: #6b7280;
+  margin-left: 12px;
 }
 
 ul.menu>li:hover {
-  background-color: rgba(255, 255, 200, 0.4);
+  background-color: #eff6ff;
+  color: #1d4ed8;
 }
 
-ul.menu>li:hover>ul.menu {
-  left: 220px;
-  top: 0;
-  display: inline-block;
+ul.menu>li.has-submenu:hover::after {
+  color: #1d4ed8;
+}
+
+ul.menu>li:hover>ul.menu,
+ul.menu>li.submenu-open>ul.menu {
+  left: 100%;
+  top: -4px;
+  display: block;
 }
 
 #gb-virtual-controls {
@@ -542,8 +647,8 @@ ul.menu>li:hover>ul.menu {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8px;
-  padding: 10px 12px;
+  gap: 6px;
+  padding: 10px 20px;
   background: linear-gradient(180deg, #26292e 0%, #17191c 100%);
   border: 1px solid #383d45;
   border-radius: 12px;
@@ -793,27 +898,29 @@ ul.menu>li:hover>ul.menu {
 /* Mobile Mode Entrance Banner (Placed above the main window) */
 .mobile-mode-banner {
   position: absolute;
-  top: max(14px, calc(50% - 248px));
+  top: max(10px, calc(50% - 304px));
   left: 50%;
   transform: translateX(-50%);
   z-index: 1;
   display: flex;
   align-items: center;
-  gap: 14px;
-  padding: 10px 22px;
-  background: rgba(255, 255, 255, 0.9);
+  gap: 12px;
+  padding: 8px 16px;
+  max-width: min(400px, calc(100vw - 16px));
+  box-sizing: border-box;
+  background: rgba(255, 255, 255, 0.92);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.8);
-  border-radius: 50px;
+  border: 1px solid rgba(255, 255, 255, 0.85);
+  border-radius: 40px;
   box-shadow:
-    0 10px 30px rgba(0, 0, 0, 0.12),
+    0 10px 28px rgba(0, 0, 0, 0.12),
     0 2px 6px rgba(0, 0, 0, 0.06),
     inset 0 1px 0 rgba(255, 255, 255, 0.95);
   text-decoration: none;
   color: #1f2937;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s ease, background 0.2s ease;
   cursor: pointer;
 }
 
@@ -821,14 +928,14 @@ ul.menu>li:hover>ul.menu {
   transform: translateX(-50%) translateY(-2px);
   background: rgba(255, 255, 255, 0.98);
   box-shadow:
-    0 16px 38px rgba(0, 0, 0, 0.18),
+    0 14px 34px rgba(0, 0, 0, 0.16),
     0 4px 10px rgba(0, 0, 0, 0.08),
     0 0 0 2px #3b82f6;
 }
 
 .mobile-mode-banner .banner-icon {
-  width: 36px;
-  height: 36px;
+  width: 34px;
+  height: 34px;
   border-radius: 50%;
   background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
   color: #ffffff;
@@ -842,15 +949,23 @@ ul.menu>li:hover>ul.menu {
 .mobile-mode-banner .banner-content {
   display: flex;
   flex-direction: column;
+  min-width: 0;
 }
 
 .mobile-mode-banner .banner-title {
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 14px;
+  font-size: 13.5px;
   font-weight: 700;
   color: #111827;
+  white-space: nowrap;
+}
+
+.mobile-mode-banner .banner-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .mobile-mode-banner .badge-pill {
@@ -858,24 +973,20 @@ ul.menu>li:hover>ul.menu {
   color: #fff;
   font-size: 10px;
   font-weight: 800;
-  padding: 1px 7px;
+  padding: 2px 7px;
   border-radius: 10px;
   letter-spacing: 0.5px;
-}
-
-.mobile-mode-banner .badge-tag {
-  font-family: monospace;
-  font-size: 11px;
-  color: #6b7280;
-  background: rgba(0, 0, 0, 0.06);
-  padding: 1px 6px;
-  border-radius: 4px;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .mobile-mode-banner .banner-desc {
   font-size: 11px;
   color: #4b5563;
   margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .mobile-mode-banner .banner-arrow {
@@ -887,21 +998,23 @@ ul.menu>li:hover>ul.menu {
 }
 
 .mobile-mode-banner:hover .banner-arrow {
-  transform: translateX(4px);
+  transform: translateX(3px);
 }
 
 a.menubar_mobile_link {
-  float: right;
-  margin: 3px 6px 3px 0;
+  margin-left: auto;
   padding: 2px 8px;
   color: #1d4ed8;
-  font-weight: bold;
+  font-weight: 600;
   font-size: 12px;
+  line-height: 18px;
   text-decoration: none;
   background: rgba(59, 130, 246, 0.12);
-  border: 1px solid rgba(59, 130, 246, 0.25);
-  border-radius: 4px;
-  display: inline-block;
+  border: 1px solid rgba(59, 130, 246, 0.28);
+  border-radius: 5px;
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
   cursor: pointer;
   transition: all 0.15s ease;
 }
@@ -909,20 +1022,16 @@ a.menubar_mobile_link {
 a.menubar_mobile_link:hover {
   background: rgba(59, 130, 246, 0.22);
   color: #1e40af;
-  box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);
 }
 
-/* Narrow viewports: keep the mobile-mode banner inside the viewport */
+/* Narrow viewports: keep windows, menus, and banner inside the viewport */
 @media (max-width: 520px) {
   .mobile-mode-banner {
     gap: 8px;
-    padding: 8px 12px;
+    padding: 7px 12px;
     border-radius: 24px;
+    width: max-content;
     max-width: calc(100vw - 16px);
-  }
-
-  .mobile-mode-banner .banner-content {
-    max-width: calc(100vw - 120px);
   }
 
   .mobile-mode-banner .banner-desc {
@@ -930,6 +1039,39 @@ a.menubar_mobile_link:hover {
   }
 
   .mobile-mode-banner .banner-title {
-    font-size: 12px;
+    font-size: 12.5px;
+  }
+}
+
+@media (max-width: 420px) {
+  div#GameBoy,
+  div#terminal,
+  div#about,
+  div#settings,
+  div#instructions,
+  div#local_storage_listing,
+  div#freeze_listing {
+    min-width: 0;
+    width: calc(100vw - 16px);
+    max-width: calc(100vw - 16px);
+  }
+
+  div#about {
+    min-height: 320px;
+  }
+
+  div#GameBoy>div#gfx>span#title {
+    font-size: 46px;
+  }
+
+  div#GameBoy>div#gfx>span#port_title {
+    font-size: 24px;
+    padding-left: 96px;
+  }
+
+  ul.menu>li:hover>ul.menu,
+  ul.menu>li.submenu-open>ul.menu {
+    left: 16px;
+    top: 100%;
   }
 }
