@@ -17,7 +17,7 @@ function base64(data) {
       var remainder = dataLength % 3;
       while (data.length % 3 > 0) {
         //Make sure we don't do fuzzy math in the next loop...
-        data[data.length] = " ";
+        data += " ";
       }
       while (index < dataLength) {
         //Keep this loop small for speed.
@@ -25,14 +25,12 @@ function base64(data) {
         base64 += toBase64[bytes[0] >> 2] + toBase64[((bytes[0] & 0x3) << 4) | (bytes[1] >> 4)] + toBase64[((bytes[1] & 0xF) << 2) | (bytes[2] >> 6)] + toBase64[bytes[2] & 0x3F];
       }
       if (remainder > 0) {
-        //Fill in the padding and recalulate the trailing six-bit group...
-        base64[base64.length - 1] = "=";
-        if (remainder == 2) {
-          base64[base64.length - 2] = "=";
-          base64[base64.length - 3] = toBase64[(bytes[0] & 0x3) << 4];
+        //Fill in the padding and recalculate the trailing six-bit group...
+        if (remainder == 1) {
+          base64 = base64.slice(0, -2) + "==";
         }
         else {
-          base64[base64.length - 2] = toBase64[(bytes[1] & 0xF) << 2];
+          base64 = base64.slice(0, -1) + "=";
         }
       }
     }
