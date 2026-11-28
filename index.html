@@ -2,6 +2,7 @@
 <html lang="zh-CN">
   <head>
     <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GameBoyColor</title>
     <link rel="icon" type="image/png" href="images/128.png">
     <link rel="stylesheet" href="css/GameBoy.css">
@@ -36,9 +37,8 @@
         <div class="banner-title">
           <span class="badge-pill">掌机模式</span>
           <span class="banner-text">GameBoy Pocket 复古模式</span>
-          <span class="badge-tag">mobile.html</span>
         </div>
-        <div class="banner-desc">精美复古机身 · 触屏与全键盘操作 · 点击立即体验</div>
+        <div class="banner-desc">经典复古机身 · 支持触屏与全键盘操作</div>
       </div>
       <div class="banner-arrow">
         <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
@@ -101,66 +101,66 @@
     </div>
     <div class="window" id="settings">
       <div id="toggle_settings">
-        <div class="setting">
-          <span>启用声音：</span>
+        <label class="setting">
+          <span>启用声音</span>
           <input type="checkbox" checked="checked" id="enable_sound"/>
-        </div>
-        <div class="setting">
-          <span>GB模式优先于GBC模式：</span>
+        </label>
+        <label class="setting">
+          <span>GB模式优先于GBC模式</span>
           <input type="checkbox" id="disable_colors"/>
-        </div>
-        <div class="setting">
-          <span>使用BIOS ROM：</span>
+        </label>
+        <label class="setting">
+          <span>使用BIOS ROM</span>
           <input type="checkbox" checked="checked" id="enable_gbc_bios"/>
-        </div>
-        <div class="setting">
-          <span>将仅含ROM的卡带类型覆盖为MBC1：</span>
-          <input type="checkbox" checked="checked" id="rom_only_override"/>
-        </div>
-        <div class="setting">
-          <span>始终允许对MBC记忆库进行读写：</span>
-          <input type="checkbox" checked="checked" id="mbc_enable_override"/>
-        </div>
-        <div class="setting">
-          <span>为经典GameBoy调色板着色：</span>
+        </label>
+        <label class="setting">
+          <span>将仅含ROM的卡带类型覆盖为MBC1</span>
+          <input type="checkbox" id="rom_only_override"/>
+        </label>
+        <label class="setting">
+          <span>始终允许对MBC记忆库进行读写</span>
+          <input type="checkbox" id="mbc_enable_override"/>
+        </label>
+        <label class="setting">
+          <span>为经典GameBoy调色板着色</span>
           <input type="checkbox" checked="checked" id="enable_colorization"/>
-        </div>
-        <div class="setting">
-          <span>全屏时使用最小化视图：</span>
-          <input type="checkbox" checked="checked" id="do_minimal"/>
-        </div>
-        <div class="setting">
-          <span>在JavaScript中直接调整画布大小：</span>
+        </label>
+        <label class="setting">
+          <span>全屏时使用最小化视图</span>
+          <input type="checkbox" id="do_minimal"/>
+        </label>
+        <label class="setting">
+          <span>在JavaScript中直接调整画布大小</span>
           <input type="checkbox" id="software_resizing"/>
-        </div>
-        <div class="setting">
-          <span>禁止使用typed arrays：</span>
+        </label>
+        <label class="setting">
+          <span>禁止使用typed arrays</span>
           <input type="checkbox" id="typed_arrays_disallow"/>
-        </div>
-        <div class="setting">
-          <span>使用DMG启动ROM而不是CGB：</span>
+        </label>
+        <label class="setting">
+          <span>使用DMG启动ROM而不是CGB</span>
           <input type="checkbox" id="gb_boot_rom_utilized"/>
-        </div>
-        <div class="setting">
-          <span>在调整画布大小时启用平滑：</span>
+        </label>
+        <label class="setting">
+          <span>在调整画布大小时启用平滑</span>
           <input type="checkbox" checked="checked" id="resize_smoothing"/>
-        </div>
-        <div class="setting">
-          <span>启用声道1：</span>
+        </label>
+        <label class="setting">
+          <span>启用声道1</span>
           <input type="checkbox" checked="checked" id="channel1"/>
-        </div>
-        <div class="setting">
-          <span>启用声道2：</span>
+        </label>
+        <label class="setting">
+          <span>启用声道2</span>
           <input type="checkbox" checked="checked" id="channel2"/>
-        </div>
-        <div class="setting">
-          <span>启用声道3：</span>
+        </label>
+        <label class="setting">
+          <span>启用声道3</span>
           <input type="checkbox" checked="checked" id="channel3"/>
-        </div>
-        <div class="setting">
-          <span>启用声道4：</span>
+        </label>
+        <label class="setting">
+          <span>启用声道4</span>
           <input type="checkbox" checked="checked" id="channel4"/>
-        </div>
+        </label>
       </div>
       <div class="button_rack">
         <button id="settings_close_button" class="center">关闭设置</button>
@@ -184,18 +184,18 @@
     </div>
     <div id="input_select" class="window">
       <form>
-        <input type="file" id="local_file_open"/>
+        <input type="file" id="local_file_open" accept=".gb,.gbc"/>
       </form>
       <div class="button_rack">
-        <button id="input_select_close_button" class="center">关闭文件输入</button>
+        <button id="input_select_close_button" class="center">关闭</button>
       </div>
     </div>
     <div id="save_importer" class="window">
       <form>
-        <input type="file" id="save_open"/>
+        <input type="file" id="save_open" accept=".sav,.export"/>
       </form>
       <div class="button_rack">
-        <button id="save_importer_close_button" class="center">关闭存档导入</button>
+        <button id="save_importer_close_button" class="center">关闭</button>
       </div>
     </div>
     <div class="window" id="local_storage_listing">
@@ -203,11 +203,11 @@
         <div id="storageListingMasterContainerSub"></div>
       </div>
       <div id="download_all_storage">
-        <a href="about:blank" id="download_local_storage_dba">导出所有存档。</a>
+        <a href="about:blank" id="download_local_storage_dba">导出所有存档</a>
       </div>
       <div class="button_rack">
         <button id="local_storage_list_refresh_button" class="left">刷新列表</button>
-        <button id="local_storage_list_close_button" class="right">关闭存储列表</button>
+        <button id="local_storage_list_close_button" class="right">关闭列表</button>
       </div>
     </div>
     <div class="window" id="local_storage_popup">
@@ -215,7 +215,7 @@
         <div id="storagePopupMasterContainer"></div>
       </div>
       <div class="button_rack">
-        <button id="local_storage_popup_close_button" class="center">关闭存储弹窗</button>
+        <button id="local_storage_popup_close_button" class="center">关闭</button>
       </div>
     </div>
     <div class="window" id="freeze_listing">
@@ -224,13 +224,13 @@
       </div>
       <div class="button_rack">
         <button id="freeze_list_refresh_button" class="left">刷新列表</button>
-        <button id="freeze_list_close_button" class="right">关闭冻结状态列表</button>
+        <button id="freeze_list_close_button" class="right">关闭列表</button>
       </div>
     </div>
     <ul class="menu" id="GameBoy_file_popup">
-      <li>打开...
+      <li class="has-submenu">打开...
         <ul class="menu">
-          <li id="data_uri_clicker">Base64加密ROM文件</li>
+          <li id="data_uri_clicker">Base64编码ROM</li>
           <li id="internal_file_clicker">本地ROM文件</li>
         </ul>
       </li>
