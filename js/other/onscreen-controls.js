@@ -88,6 +88,7 @@
         lastRect = null;
         return;
       }
+      var wasHidden = controls.style.display === "none";
       if (
         !lastRect ||
         r.left !== lastRect.left ||
@@ -104,6 +105,9 @@
           height: r.height,
           bottom: r.bottom
         };
+        if (wasHidden && typeof windowStacks !== "undefined" && windowStacks[0]) {
+          windowStacks[0].center();
+        }
       }
     }
     if (window.ResizeObserver) {
