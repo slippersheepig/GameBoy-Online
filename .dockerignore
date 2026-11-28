@@ -1,4 +1,7 @@
 .git
+.github
+.dockerignore
+.nginx_last_updated
 Dockerfile
+docker
 README.md
-.nginx
