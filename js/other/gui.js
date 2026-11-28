@@ -376,6 +376,14 @@ function registerGUIEvents() {
       windowStacks[0].center();
     }
   });
+  addEvent("pagehide", window, function () {
+    autoSave();
+  });
+  addEvent("visibilitychange", document, function () {
+    if (document.visibilityState === "hidden") {
+      autoSave();
+    }
+  });
   addEvent("unload", window, function () {
     autoSave();
   });
@@ -505,7 +513,9 @@ function refreshFreezeListing() {
   storageListMasterDiv.appendChild(storageListMasterDivSub);
 }
 function outputFreezeStateRequestLink(keyName) {
-  var linkNode = generateLink("javascript:runFreeze(\"" + keyName + "\")", keyName);
+  var linkNode = generateActionLink(keyName, function () {
+    runFreeze(keyName);
+  });
   var storageContainerDiv = document.createElement("div");
   storageContainerDiv.className = "storageListingContainer";
   storageContainerDiv.appendChild(linkNode);
@@ -540,7 +550,9 @@ function getBlobPreEncoded(keyName) {
   }
 }
 function outputLocalStorageRequestLink(keyName) {
-  var linkNode = generateLink("javascript:popupStorageDialog(\"" + keyName + "\")", keyName);
+  var linkNode = generateActionLink(keyName, function () {
+    popupStorageDialog(keyName);
+  });
   var storageContainerDiv = document.createElement("div");
   storageContainerDiv.className = "storageListingContainer";
   storageContainerDiv.appendChild(linkNode);
@@ -572,7 +584,9 @@ function popupStorageDialog(keyName) {
   else {
     downloadDiv.appendChild(outputLocalStorageLink("以模拟器格式下载存档。", base64(generateBlob(keyName, JSON.stringify(findValue(keyName)))), keyName));
   }
-  var deleteLink = generateLink("javascript:deleteStorageSlot(\"" + keyName + "\")", "从HTML5本地存储中删除数据。");
+  var deleteLink = generateActionLink("从HTML5本地存储中删除数据。", function () {
+    deleteStorageSlot(keyName);
+  });
   deleteLink.id = "storagePopupDelete";
   subContainer.appendChild(downloadDiv);
   subContainer.appendChild(deleteLink);
@@ -596,6 +610,16 @@ function generateLink(address, textData) {
   var link = document.createElement("a");
   link.href = address;
   link.appendChild(document.createTextNode(textData));
+  return link;
+}
+function generateActionLink(textData, callback) {
+  var link = generateLink("#", textData);
+  addEvent("click", link, function (event) {
+    if (event && event.preventDefault) {
+      event.preventDefault();
+    }
+    callback();
+  });
   return link;
 }
 function generateDownloadLink(address, textData, keyName) {
