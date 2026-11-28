@@ -78,6 +78,12 @@ function toggleAudio() {
         updateAudioBadge(settings[0]);
       }
     }
+  } else if (typeof settings !== "undefined") {
+    settings[0] = !settings[0];
+    if (typeof gameboy === "object" && gameboy && typeof gameboy.initSound === "function") {
+      gameboy.initSound();
+    }
+    updateAudioBadge(settings[0]);
   }
 }
 
@@ -316,11 +322,11 @@ function keyUp(event) {
 }
 
 var gameBoyColors = [
-  "#33B678", // Emerald Green
-  "#F5D130", // Canary Yellow
-  "#E54B3C", // Pocket Red
-  "#3B7CE8", // Cobalt Blue
-  "#8C949E"  // Classic Silver/Grey
+  "#34B37A", // Emerald Green
+  "#F2CE3E", // Sunburst Yellow
+  "#E85647", // Pocket Coral Red
+  "#4D8DF0", // Sky Cobalt Blue
+  "#96A0AA"  // Classic Silver/Grey
 ];
 
 function pickRandomColor() {
@@ -381,6 +387,12 @@ function windowingInitialize() {
   setupControlEvents();
   setupAudioListeners();
   setupRomLoader();
+  window.addEventListener("pagehide", autoSave);
+  document.addEventListener("visibilitychange", function () {
+    if (document.visibilityState === "hidden") {
+      autoSave();
+    }
+  });
   window.onunload = autoSave;
 
   ("MozActivity" in window ? loadViaMozActivity : loadViaXHR)();
