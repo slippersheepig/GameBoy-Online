@@ -32,11 +32,18 @@ windowStack.prototype.syncBannerPosition = function () {
   if (this.domObject.id === "GameBoy") {
     var banner = document.getElementById("mobile_mode_banner");
     if (banner) {
+      var docWidth = document.documentElement.clientWidth || window.innerWidth || 0;
       var gbTop = parseInt(this.domObject.style.top, 10) || 0;
       var gbLeft = parseInt(this.domObject.style.left, 10) || 0;
-      var bannerHeight = banner.offsetHeight || 58;
-      banner.style.top = Math.max(gbTop - bannerHeight - 14, 10) + "px";
-      banner.style.left = (gbLeft + Math.round(this.domObject.offsetWidth / 2)) + "px";
+      var bannerHeight = banner.offsetHeight || 52;
+      var bannerWidth = banner.offsetWidth || 340;
+      var centerX = gbLeft + Math.round(this.domObject.offsetWidth / 2);
+      if (docWidth > bannerWidth + 16) {
+        var halfBanner = Math.ceil(bannerWidth / 2);
+        centerX = Math.min(Math.max(centerX, halfBanner + 8), docWidth - halfBanner - 8);
+      }
+      banner.style.top = Math.max(gbTop - bannerHeight - 12, 8) + "px";
+      banner.style.left = centerX + "px";
     }
   }
 };
@@ -133,21 +140,21 @@ windowStack.prototype.lostFocus = function () {
   }
 };
 windowStack.prototype.center = function () {
-  var docWidth = Math.max(document.documentElement.clientWidth, document.getElementsByTagName("body")[0].clientWidth);
-  var docHeight = Math.max(document.documentElement.clientHeight, document.getElementsByTagName("body")[0].clientHeight);
-  var docLeft = Math.max(document.documentElement.scrollLeft, document.getElementsByTagName("body")[0].scrollLeft);
-  var docTop = Math.max(document.documentElement.scrollTop, document.getElementsByTagName("body")[0].scrollTop);
-  this.domObject.style.left = Math.round(((docWidth - this.domObject.offsetWidth) / 2) + docLeft) + "px";
+  var docWidth = document.documentElement.clientWidth || window.innerWidth || 0;
+  var docHeight = document.documentElement.clientHeight || window.innerHeight || 0;
+  var docLeft = window.pageXOffset || document.documentElement.scrollLeft || 0;
+  var docTop = window.pageYOffset || document.documentElement.scrollTop || 0;
+  this.domObject.style.left = Math.max(Math.round(((docWidth - this.domObject.offsetWidth) / 2) + docLeft), 8) + "px";
   if (this.domObject.id === "GameBoy") {
     var controls = document.getElementById("gb-virtual-controls");
     var banner = document.getElementById("mobile_mode_banner");
-    var extraBottom = controls ? ((controls.offsetHeight || 190) + 8) : 0;
-    var extraTop = banner ? ((banner.offsetHeight || 58) + 14) : 0;
-    this.domObject.style.top = Math.max(Math.round(((docHeight - this.domObject.offsetHeight - extraBottom + extraTop) / 2) + docTop), extraTop + 10) + "px";
+    var extraBottom = controls ? ((controls.offsetHeight || 198) + 8) : 0;
+    var extraTop = banner ? ((banner.offsetHeight || 52) + 12) : 0;
+    this.domObject.style.top = Math.max(Math.round(((docHeight - this.domObject.offsetHeight - extraBottom + extraTop) / 2) + docTop), extraTop + 8) + "px";
     this.syncBannerPosition();
   }
   else {
-    this.domObject.style.top = Math.max(Math.round(((docHeight - this.domObject.offsetHeight) / 2) + docTop), 40) + "px";
+    this.domObject.style.top = Math.max(Math.round(((docHeight - this.domObject.offsetHeight) / 2) + docTop), 24) + "px";
   }
 };
 windowStack.prototype.hide = function () {
@@ -159,39 +166,111 @@ windowStack.prototype.show = function () {
   this.bringToFront();
   this.registerMouseEvents();
 };
+var activePopupMenus = [];
+function closeAllPopupMenus(exceptMenu) {
+  for (var index = 0; index < activePopupMenus.length; ++index) {
+    if (activePopupMenus[index] !== exceptMenu) {
+      activePopupMenus[index].closePopup();
+    }
+  }
+}
 function popupMenu(oClick, oMenu) {
   this.clickElement = oClick;
   this.menuElement = oMenu;
-  var thisObj2 = this;
-  this.eventHandle = [
-    function (event) { thisObj2.startPopup(event); },
-    function (event) { thisObj2.endPopup(event); }
-  ];
   this.open = false;
-  addEvent("click", this.clickElement, this.eventHandle[0]);
+  var thisObj2 = this;
+  activePopupMenus.push(this);
+  addEvent("click", this.clickElement, function (event) {
+    if (event && event.stopPropagation) {
+      event.stopPropagation();
+    }
+    if (thisObj2.open) {
+      thisObj2.closePopup();
+    }
+    else {
+      closeAllPopupMenus(thisObj2);
+      thisObj2.startPopup(event);
+    }
+  });
+  addEvent("click", this.menuElement, function (event) {
+    var target = (event && event.target) ? event.target : event.srcElement;
+    while (target && target !== thisObj2.menuElement) {
+      if (target.tagName && target.tagName.toUpperCase() === "LI") {
+        if (target.className && target.className.indexOf("has-submenu") !== -1) {
+          if (target.classList) {
+            target.classList.toggle("submenu-open");
+          }
+          if (event && event.stopPropagation) {
+            event.stopPropagation();
+          }
+          return;
+        }
+        thisObj2.closePopup();
+        return;
+      }
+      target = target.parentNode;
+    }
+  });
+  this.outsideHandler = function (event) {
+    if (!thisObj2.open) {
+      return;
+    }
+    var target = (event && event.target) ? event.target : event.srcElement;
+    if (
+      target !== thisObj2.clickElement &&
+      !isDescendantOf(thisObj2.clickElement, target) &&
+      target !== thisObj2.menuElement &&
+      !isDescendantOf(thisObj2.menuElement, target)
+    ) {
+      thisObj2.closePopup();
+    }
+  };
+  this.keyHandler = function (event) {
+    if (thisObj2.open && event && event.keyCode === 27) {
+      thisObj2.closePopup();
+    }
+  };
+  addEvent("mousedown", document, this.outsideHandler);
+  addEvent("touchstart", document, this.outsideHandler);
+  addEvent("keydown", document, this.keyHandler);
 }
 popupMenu.prototype.startPopup = function (event) {
   if (!this.open) {
     this.open = true;
     this.menuElement.style.display = "block";
-    removeEvent("click", this.clickElement, this.eventHandle[0]);
     this.position(event);
-    addEvent("mouseout", this.menuElement, this.eventHandle[1]);
   }
 };
-popupMenu.prototype.endPopup = function (event) {
+popupMenu.prototype.closePopup = function () {
   if (this.open) {
-    if (mouseLeaveVerify(this.menuElement, event)) {
-      this.open = false;
-      this.menuElement.style.display = "none";
-      removeEvent("mouseout", this.menuElement, this.eventHandle[1]);
-      addEvent("click", this.clickElement, this.eventHandle[0]);
+    this.open = false;
+    this.menuElement.style.display = "none";
+    var openSubmenus = this.menuElement.querySelectorAll
+      ? this.menuElement.querySelectorAll(".submenu-open")
+      : [];
+    for (var i = 0; i < openSubmenus.length; ++i) {
+      openSubmenus[i].classList.remove("submenu-open");
     }
   }
 };
 popupMenu.prototype.position = function (event) {
   if (this.open) {
-    this.menuElement.style.left = (pageXCoord(event) - 5) + "px";
-    this.menuElement.style.top = (pageYCoord(event) - 5) + "px";
+    var scrollX = window.pageXOffset || document.documentElement.scrollLeft || 0;
+    var scrollY = window.pageYOffset || document.documentElement.scrollTop || 0;
+    var docWidth = document.documentElement.clientWidth || window.innerWidth || 0;
+    if (this.clickElement && this.clickElement.getBoundingClientRect) {
+      var rect = this.clickElement.getBoundingClientRect();
+      var menuWidth = this.menuElement.offsetWidth || 168;
+      var targetLeft = Math.round(rect.left + scrollX);
+      if (docWidth > menuWidth + 16) {
+        targetLeft = Math.min(Math.max(targetLeft, 8), docWidth - menuWidth - 8);
+      }
+      this.menuElement.style.left = targetLeft + "px";
+      this.menuElement.style.top = Math.round(rect.bottom + scrollY + 4) + "px";
+    }
+    else {
+      this.menuElement.style.left = (pageXCoord(event) - 5) + "px";
+      this.menuElement.style.top = (pageYCoord(event) + 12) + "px";
+    }
   }
 };
